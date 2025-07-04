@@ -66,7 +66,7 @@ if st.session_state["excel_bytes"]:
 
     # 2) Editable grid
     df = pd.read_excel(io.BytesIO(st.session_state["excel_bytes"]))
-    edited_df = st.data_editor(
+    edited_df = st.experimental_data_editor(
         df,
         num_rows="dynamic",
         use_container_width=True,
