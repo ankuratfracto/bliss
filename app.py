@@ -1,4 +1,4 @@
-# app.py
+<file name=1 path=/Users/ankurgupta/myprojects/mcc/app.py># app.py
 
 
 import io, textwrap
@@ -25,6 +25,16 @@ st.markdown(f"""
     /* Page background */
     .stApp {{
         background: {FRACTO_LIGHT_BG};
+    }}
+    /* Center main content max-width 880px */
+    .main .block-container{{
+        max-width:880px;
+        margin:auto;
+    }}
+    .block-container{{
+        max-width:880px !important;
+        margin-left:auto !important;
+        margin-right:auto !important;
     }}
     /* Primary buttons */
     button[kind="primary"] {{
