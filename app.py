@@ -6,6 +6,8 @@ import streamlit as st
 import os
 import pandas as pd
 import matplotlib.pyplot as plt
+from pathlib import Path
+import base64
 from mcc import call_fracto, write_excel_from_ocr, _extract_rows, MAPPINGS, stamp_job_number
 from PyPDF2 import PdfReader
 
@@ -171,9 +173,22 @@ st.markdown(f"""
 """, unsafe_allow_html=True)
 # ── Clients logo strip ───────────────────────────────────────
 def build_logo_strip(logo_paths: list[str]) -> str:
-    tags = "".join(f"<img src='{p}' alt='' />" for p in logo_paths)
-    # Duplicate sequence for seamless scroll
-    return f"<div class='logo-strip'>{tags}{tags}</div>"
+    """
+    Return HTML for the scrolling logo strip.
+    Each file is read from disk and embedded as a Base64 data‑URI,
+    so it renders correctly on Streamlit Cloud.
+    """
+    tags = ""
+    script_dir = Path(__file__).parent
+    for rel_path in logo_paths:
+        img_path = (script_dir / rel_path).expanduser().resolve()
+        if not img_path.exists():
+            continue
+        mime = "image/svg+xml" if img_path.suffix.lower() == ".svg" else "image/png"
+        b64   = base64.b64encode(img_path.read_bytes()).decode("utf-8")
+        tags += f"<img src='data:{mime};base64,{b64}' alt='' />"
+    # Duplicate sequence so the CSS animation loops seamlessly
+    return f"<div class='logo-strip-wrapper'><div class='logo-strip'>{tags}{tags}</div></div>"
 
 st.markdown(
     """
