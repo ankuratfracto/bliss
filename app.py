@@ -39,6 +39,16 @@ st.markdown(f"""
     h1 {{
         color: {FRACTO_DARK};
     }}
+    /* Manual text_input boxes: white background & border */
+    .stTextInput > div > div > input {{
+        background-color: #ffffff !important;
+        border: 1px solid #CCCCCC !important;
+        border-radius: 4px !important;
+    }}
+    .stTextInput > div > div > input:focus {{
+        border: 1px solid #0066FF !important;   /* Fracto primary on focus */
+        box-shadow: 0 0 0 2px rgba(0,102,255,0.2) !important;
+    }}
     </style>
 """, unsafe_allow_html=True)
 
