@@ -1,10 +1,18 @@
 # app.py
 
+
 import io, textwrap
 import streamlit as st
 import os
 import pandas as pd
 from mcc import call_fracto, write_excel_from_ocr, _extract_rows, MAPPINGS
+
+# ── Page config (must be first Streamlit command) ─────────────
+st.set_page_config(
+    page_title="PDF → Smart‑OCR → Excel",
+    page_icon="📄",
+    layout="wide",
+)
 
 # ── Fracto branding styles ────────────────────────────────────
 FRACTO_PRIMARY   = "#0066FF"   # adjust if brand palette differs
@@ -50,9 +58,6 @@ if "edited_excel_bytes" not in st.session_state:
 if "FRACTO_API_KEY" in st.secrets:
     os.environ["FRACTO_API_KEY"] = st.secrets["FRACTO_API_KEY"]
 
-# ── Page config ───────────────────────────────────────────────
-st.set_page_config(page_title="PDF → Smart-OCR → Excel",
-                   page_icon="📄", layout="wide")
 
 st.markdown("## Smart‑OCR to ERP‑ready Excel")
 
