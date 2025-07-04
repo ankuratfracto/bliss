@@ -16,7 +16,7 @@ st.set_page_config(
 )
 
 # ── Fracto branding styles ────────────────────────────────────
-FRACTO_PRIMARY   = "#00AB6B"   # adjust if brand palette differs
+FRACTO_PRIMARY   = "#0066FF"   # adjust if brand palette differs
 FRACTO_DARK      = "#003B9C"
 FRACTO_LIGHT_BG  = "#F5F8FF"
 
@@ -155,31 +155,32 @@ st.markdown(
     }
     .card {
         flex: 1 1 200px;
-        background: #F6F8FA;                /* softer grey */
+        background: #FFFFFF;
         border: 1px solid #E0E0E0;
-        border-radius: 12px;                /* rounder corners */
-        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-        padding: 1rem;                      /* ~16 px */
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        padding: 1rem;
         text-align: center;
-        transition: transform .2s ease, box-shadow .2s ease;
-    }
-    .card:hover{
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
     }
     .card-icon {
-        font-size: 2rem;
-        margin-bottom: 0.5rem;
+        margin-bottom: 8px;
+        display:flex;
+        justify-content:center;
     }
-    .card h4 {
-        margin: 0.2rem 0 0.5rem 0;
+    .card-icon img{
+        width:36px;
+        height:36px;
+    }
+    .card h4{
+        font-size:16px;
+        font-weight:600;
+        margin:4px 0 8px 0;
         color: #003B9C;
-        font-weight: 600;
     }
-    .card p {
-        font-size: 0.9rem;
-        line-height: 1.3rem;
-        margin: 0;
+    .card p{
+        font-size:13px;
+        line-height:1.4rem;
+        margin:0;
     }
     </style>
     """,
@@ -223,26 +224,16 @@ if "FRACTO_API_KEY" in st.secrets:
 # ── Hero / intro ──────────────────────────────────────────────
 st.markdown(
     '''
-    <div style="text-align:center;margin-bottom:32px;">
-      <h2 style="color:#003B9C;font-weight:600;margin:0;">Automate imports. Eliminate re‑typing.</h2>
-      <p style="font-size:1.05rem;line-height:1.5rem;margin:8px 0 24px;">
-        Fracto converts your shipping invoices, customs docs and purchase orders into<br>
-        ERP‑ready spreadsheets in seconds — complete with your business rules and validation checks.
-      </p>
-      <a href="#upload" style="
-          background:#00AB6B;
-          color:#fff;
-          padding:10px 22px;
-          border-radius:6px;
-          text-decoration:none;
-          font-weight:500;
-          transition:background .2s;">
-        Get started
-      </a>
-    </div>
+    <h2 style="color:#003B9C;font-weight:600;margin-bottom:0.2rem;">Automate imports. Eliminate re‑typing.</h2>
+    <p style="font-size:1.05rem;line-height:1.5rem;margin-bottom:1.5rem;">
+      Fracto converts your shipping invoices, customs docs and purchase orders into<br>
+      ERP‑ready spreadsheets in seconds — complete with your business rules and validation checks.
+    </p>
     ''',
     unsafe_allow_html=True,
 )
+# 24px spacing before uploader
+st.markdown("<div style='height:24px'></div>", unsafe_allow_html=True)
 
 st.markdown("## Smart‑OCR to ERP‑ready Excel")
 
@@ -389,11 +380,11 @@ st.markdown("---")
 
 
 # ── Card rendering helper ─────────────────────────────────────
-def render_card(icon: str, title: str, body: str, *, width="250px") -> str:
+def render_card(icon_url: str, title: str, body: str, *, width="250px") -> str:
     """Return HTML for a single card."""
     return f"""
         <div class="card" style="max-width:{width};">
-          <div class="card-icon">{icon}</div>
+          <div class="card-icon"><img src="{icon_url}" alt=""></div>
           <h4>{title}</h4>
           <p>{body}</p>
         </div>
@@ -403,16 +394,20 @@ def render_card(icon: str, title: str, body: str, *, width="250px") -> str:
 st.markdown('<h3 id="how">How it works</h3>', unsafe_allow_html=True)
 
 steps = [
-    ("📤", "Upload", "Drag PDFs or images of invoices, POs, customs docs into the drop‑zone."),
-    ("🤖", "AI Extraction", "Vision models read tables, handwriting and stamps with 99 %+ accuracy."),
-    ("📝", "Review & Edit", "Adjust any field inline — spreadsheet‑style editor keeps you in control."),
-    ("🔄", "Export", "Download ERP‑ready Excel or push straight into your system via API."),
+    ("https://unpkg.com/@tabler/icons@2.54.0/icons/upload.svg", "Upload",
+     "Drag PDFs or images of invoices, POs, customs docs into the drop‑zone."),
+    ("https://unpkg.com/@tabler/icons@2.54.0/icons/cpu.svg", "AI Extraction",
+     "Vision models read tables, handwriting and stamps with 99 %+ accuracy."),
+    ("https://unpkg.com/@tabler/icons@2.54.0/icons/edit.svg", "Review & Edit",
+     "Adjust any field inline — spreadsheet‑style editor keeps you in control."),
+    ("https://unpkg.com/@tabler/icons@2.54.0/icons/arrows-left-right.svg", "Export",
+     "Download ERP‑ready Excel or push straight into your system via API."),
 ]
 
 cols = st.columns(4)
-for col, (icon, title, body) in zip(cols, steps):
+for col, (icon_url, title, body) in zip(cols, steps):
     with col:
-        col.markdown(render_card(icon, title, body), unsafe_allow_html=True)
+        col.markdown(render_card(icon_url, title, body), unsafe_allow_html=True)
 
 st.markdown("---")
 
@@ -420,15 +415,18 @@ st.markdown("---")
 st.markdown('<h3 id="usecases">Popular use‑cases</h3>', unsafe_allow_html=True)
 
 use_cases = [
-    ("🛳️", "Import Logistics", "Bills of lading, packing lists, HS‑code mapping — ready for customs clearance."),
-    ("🏭", "Manufacturing", "Supplier invoices and QC sheets flow directly into SAP/Oracle with serial‑level traceability."),
-    ("💸", "Finance & AP", "Reconcile bank statements and purchase invoices 10× faster with zero manual key‑in."),
+    ("https://unpkg.com/@tabler/icons@2.54.0/icons/ship.svg", "Import Logistics",
+     "Bills of lading, packing lists, HS‑code mapping — ready for customs clearance."),
+    ("https://unpkg.com/@tabler/icons@2.54.0/icons/building-factory.svg", "Manufacturing",
+     "Supplier invoices and QC sheets flow directly into SAP/Oracle with serial‑level traceability."),
+    ("https://unpkg.com/@tabler/icons@2.54.0/icons/currency-dollar.svg", "Finance & AP",
+     "Reconcile bank statements and purchase invoices 10× faster with zero manual key‑in."),
 ]
 
 uc_cols = st.columns(3)
-for col, (icon, title, body) in zip(uc_cols, use_cases):
+for col, (icon_url, title, body) in zip(uc_cols, use_cases):
     with col:
-        col.markdown(render_card(icon, title, body, width="280px"), unsafe_allow_html=True)
+        col.markdown(render_card(icon_url, title, body, width="280px"), unsafe_allow_html=True)
 
 st.markdown("---")
 
