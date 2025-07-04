@@ -155,25 +155,25 @@ st.markdown(f"""
         margin:24px auto;
         overflow:hidden;
     }}
-    .logo-strip{
+    .logo-strip{{
         display:inline-block;
         white-space:nowrap;
         animation:logoscroll 20s linear infinite; /* doubled speed */
-    }
-    .logo-strip img{
+    }}
+    .logo-strip img{{
         height:48px;
         margin:0 32px;
         vertical-align:middle;
         display:inline-block;
-    }
+    }}
     /* Remove extra gap where the duplicated sequence joins */
-    .logo-strip img:last-child{
+    .logo-strip img:last-child{{
         margin-right:0;
-    }
+    }}
     /* Remove margin-left on first clone to shorten overall gap */
-    .logo-strip img:nth-child(1){
+    .logo-strip img:nth-child(1){{
         margin-left:0;
-    }
+    }}
     @keyframes logoscroll{{
         0%   {{transform:translateX(0);}}
         100% {{transform:translateX(-50%);}}
