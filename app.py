@@ -384,12 +384,37 @@ with col3:
 st.markdown("---")
 
 
+# ── Inline SVG icons (Tabler, 36×36, stroke‑currentColor) ─
+ICONS = {
+    "upload": '''
+      <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" stroke="#00895A" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" /><polyline points="7 9 12 4 17 9" /><line x1="12" y1="4" x2="12" y2="16" /></svg>
+    ''',
+    "cpu": '''
+      <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" stroke="#00895A" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="1" /><rect x="9" y="9" width="6" height="6" rx="1" /><path d="M3 9h1" /><path d="M3 15h1" /><path d="M20 9h1" /><path d="M20 15h1" /><path d="M9 3v1" /><path d="M15 3v1" /><path d="M9 20v1" /><path d="M15 20v1" /></svg>
+    ''',
+    "edit": '''
+      <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" stroke="#00895A" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3l4 4l-11 11h-4v-4z" /><path d="M13 6l4 4" /><path d="M3 20v1h1l3-3" /></svg>
+    ''',
+    "export": '''
+      <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" stroke="#00895A" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3v4a1 1 0 0 0 1 1h4" /><path d="M5 12v-7a2 2 0 0 1 2 -2h7l5 5v4" /><path d="M9 15l3 -3l3 3" /><path d="M12 12v9" /></svg>
+    ''',
+    "ship": '''
+      <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" stroke="#00895A" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9 -4l9 4l-9 4z" /><path d="M3 9l9 4l9 -4" /><path d="M12 19l0 -11" /><path d="M9 21l-1 -7" /><path d="M15 21l1 -7" /></svg>
+    ''',
+    "factory": '''
+      <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" stroke="#00895A" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21v-13l8 -4v7l8 -4v14" /><path d="M13 13l-8 -4" /><path d="M5 17h2v4h-2z" /><path d="M9 17h2v4h-2z" /><path d="M13 17h2v4h-2z" /><path d="M17 17h2v4h-2z" /></svg>
+    ''',
+    "dollar": '''
+      <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" stroke="#00895A" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18" /><path d="M17 8a5 5 0 0 0 -10 0c0 5 5 3 10 8a5 5 0 0 1 -10 0" /></svg>
+    ''',
+}
+
 # ── Card rendering helper ─────────────────────────────────────
-def render_card(icon_url: str, title: str, body: str, *, width="250px") -> str:
-    """Return HTML for a single card."""
+def render_card(icon_name: str, title: str, body: str, *, width="250px") -> str:
+    svg = ICONS.get(icon_name, "")
     return f"""
         <div class="card" style="max-width:{width};">
-          <div class="card-icon"><img src="{icon_url}" alt=""></div>
+          <div class="card-icon">{svg}</div>
           <h4>{title}</h4>
           <p>{body}</p>
         </div>
@@ -399,20 +424,16 @@ def render_card(icon_url: str, title: str, body: str, *, width="250px") -> str:
 st.markdown('<h3 id="how">How it works</h3>', unsafe_allow_html=True)
 
 steps = [
-    ("https://unpkg.com/@tabler/icons@2.54.0/icons/upload.svg", "Upload",
-     "Drag PDFs or images of invoices, POs, customs docs into the drop‑zone."),
-    ("https://unpkg.com/@tabler/icons@2.54.0/icons/cpu.svg", "AI Extraction",
-     "Vision models read tables, handwriting and stamps with 99 %+ accuracy."),
-    ("https://unpkg.com/@tabler/icons@2.54.0/icons/edit.svg", "Review & Edit",
-     "Adjust any field inline — spreadsheet‑style editor keeps you in control."),
-    ("https://unpkg.com/@tabler/icons@2.54.0/icons/arrows-left-right.svg", "Export",
-     "Download ERP‑ready Excel or push straight into your system via API."),
+    ("upload", "Upload", "Drag PDFs or images of invoices, POs, customs docs into the drop‑zone."),
+    ("cpu", "AI Extraction", "Vision models read tables, handwriting and stamps with 99 %+ accuracy."),
+    ("edit", "Review & Edit", "Adjust any field inline — spreadsheet‑style editor keeps you in control."),
+    ("export", "Export", "Download ERP‑ready Excel or push straight into your system via API."),
 ]
 
 cols = st.columns(4)
-for col, (icon_url, title, body) in zip(cols, steps):
+for col, (icon_name, title, body) in zip(cols, steps):
     with col:
-        col.markdown(render_card(icon_url, title, body), unsafe_allow_html=True)
+        col.markdown(render_card(icon_name, title, body), unsafe_allow_html=True)
 
 st.markdown("---")
 
@@ -420,18 +441,15 @@ st.markdown("---")
 st.markdown('<h3 id="usecases">Popular use‑cases</h3>', unsafe_allow_html=True)
 
 use_cases = [
-    ("https://unpkg.com/@tabler/icons@2.54.0/icons/ship.svg", "Import Logistics",
-     "Bills of lading, packing lists, HS‑code mapping — ready for customs clearance."),
-    ("https://unpkg.com/@tabler/icons@2.54.0/icons/building-factory.svg", "Manufacturing",
-     "Supplier invoices and QC sheets flow directly into SAP/Oracle with serial‑level traceability."),
-    ("https://unpkg.com/@tabler/icons@2.54.0/icons/currency-dollar.svg", "Finance & AP",
-     "Reconcile bank statements and purchase invoices 10× faster with zero manual key‑in."),
+    ("ship", "Import Logistics", "Bills of lading, packing lists, HS‑code mapping — ready for customs clearance."),
+    ("factory", "Manufacturing", "Supplier invoices and QC sheets flow directly into SAP/Oracle with serial‑level traceability."),
+    ("dollar", "Finance & AP", "Reconcile bank statements and purchase invoices 10× faster with zero manual key‑in."),
 ]
 
 uc_cols = st.columns(3)
-for col, (icon_url, title, body) in zip(uc_cols, use_cases):
+for col, (icon_name, title, body) in zip(uc_cols, use_cases):
     with col:
-        col.markdown(render_card(icon_url, title, body, width="280px"), unsafe_allow_html=True)
+        col.markdown(render_card(icon_name, title, body, width="280px"), unsafe_allow_html=True)
 
 st.markdown("---")
 
