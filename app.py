@@ -89,6 +89,36 @@ with col3:
 
 st.markdown("---")
 
+# ── How it works ──────────────────────────────────────────────
+st.markdown("### How it works")
+how_cols = st.columns(4)
+steps = [
+    ("📤 Upload", "Drag PDFs or images of invoices, POs, customs docs into the drop‑zone."),
+    ("🤖 AI Extraction", "Fracto’s vision models read tables, handwriting and stamps with 99 %+ accuracy."),
+    ("📝 Review & Edit", "Adjust any field inline — our spreadsheet‑style editor keeps you in control."),
+    ("🔄 Export", "Download an ERP‑ready Excel or push straight into your system via API."),
+]
+for (icon, title), col in zip(steps, how_cols):
+    with col:
+        st.markdown(f"#### {icon}<br>{title}", unsafe_allow_html=True)
+
+st.markdown("---")
+
+# ── Popular use‑cases ─────────────────────────────────────────
+st.markdown("### Popular use‑cases")
+uc1, uc2, uc3 = st.columns(3)
+with uc1:
+    st.markdown("#### 🛳️ Import Logistics")
+    st.write("Bill of lading, packing lists, HS‑code mapping — ready for customs clearance.")
+with uc2:
+    st.markdown("#### 🏭 Manufacturing")
+    st.write("Supplier invoices and QC sheets flow directly into SAP or Oracle with serial‑level traceability.")
+with uc3:
+    st.markdown("#### 💸 Finance & AP")
+    st.write("Reconcile bank statements and purchase invoices 10× faster with zero manual key‑in.")
+
+st.markdown("---")
+
 # 1) Upload widget
 pdf_file = st.file_uploader("Upload PDF", type=["pdf"])
 
