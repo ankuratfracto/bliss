@@ -181,16 +181,15 @@ st.markdown("#### Optional manual fields")
 manual_inputs: dict[str, str] = {}
 job_no: str | None = None
 
-for col in ["Part No.", "Manufacturer Country", "Job Number"]:
-    if col not in MAPPINGS and col != "Job Number":
-        continue  # skip columns not in Excel mapping
+manual_fields = ["Part No.", "Manufacturer Country", "Job Number"]
+for col in manual_fields:
     val = st.text_input(col, key=f"manual_{col}")
     if not val:
         continue
     if col == "Job Number":
-        job_no = val               # keep separately for PDF stamp
+        job_no = val          # only stamp on PDF
     else:
-        manual_inputs[col] = val    # pass to Excel overrides
+        manual_inputs[col] = val  # Excel overrides
 
 # Process button
 run = st.button("⚙️ Process PDF", disabled=pdf_file is None)
