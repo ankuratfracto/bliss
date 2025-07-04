@@ -147,8 +147,38 @@ st.markdown(f"""
         box-shadow: 0 4px 8px rgba(0,0,0,0.15);
         transition: box-shadow 0.3s ease-in-out;
     }}
+    /* Scrolling logo strip */
+    .logo-strip {{
+        overflow: hidden;
+        white-space: nowrap;
+        box-sizing: border-box;
+        animation: logoscroll 40s linear infinite;
+        margin: 24px 0;
+    }}
+    .logo-strip img{{
+        height:48px;
+        margin:0 32px;
+        vertical-align: middle;
+        display:inline-block;
+        filter: grayscale(100%);
+        opacity:0.8;
+        transition: opacity .2s;
+    }}
+    .logo-strip img:hover{{
+        filter: grayscale(0%);
+        opacity:1;
+    }}
+    @keyframes logoscroll{{
+        0%   {{transform: translateX(0);}}
+        100% {{transform: translateX(-50%);}}
+    }}
     </style>
 """, unsafe_allow_html=True)
+# ── Clients logo strip ───────────────────────────────────────
+def build_logo_strip(logo_paths: list[str]) -> str:
+    tags = "".join(f"<img src='{p}' alt='' />" for p in logo_paths)
+    # Duplicate sequence for seamless scroll
+    return f"<div class='logo-strip'>{tags}{tags}</div>"
 
 st.markdown(
     """
@@ -392,6 +422,18 @@ if st.session_state["excel_bytes"]:
             ax.set_ylabel("Part No.")
             st.pyplot(fig)
 
+st.markdown("---")
+
+# ── Clients logo strip ───────────────────────────────────────
+st.markdown("### Trusted by global importers")
+logo_files = [
+    "clients/maersk.png",
+    "clients/ge.png",
+    "clients/volvo.png",
+    "clients/ikea.png",
+    "clients/siemens.png",
+]
+st.markdown(build_logo_strip(logo_files), unsafe_allow_html=True)
 st.markdown("---")
 
 # ── Benefits grid ─────────────────────────────────────────────
