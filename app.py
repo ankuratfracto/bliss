@@ -7,6 +7,7 @@ import os
 import pandas as pd
 import matplotlib.pyplot as plt
 from mcc import call_fracto, write_excel_from_ocr, _extract_rows, MAPPINGS, stamp_job_number
+from PyPDF2 import PdfReader
 
 # ── Page config (must be first Streamlit command) ─────────────
 st.set_page_config(
@@ -248,14 +249,31 @@ st.markdown('<h3 id="upload">1. Upload and process your PDF</h3>', unsafe_allow_
 # Upload widget
 pdf_file = st.file_uploader("Upload PDF", type=["pdf"])
 
+# Show thumbnail info after upload
+if pdf_file:
+    # Show file thumbnail info
+    file_size_kb = pdf_file.size / 1024
+    try:
+        page_count = len(PdfReader(pdf_file).pages)
+    except Exception:
+        page_count = "?"
+    st.info(f"**{pdf_file.name}**  •  {file_size_kb:,.1f} KB  •  {page_count} page(s)")
+    # Reset file pointer for later reading
+    pdf_file.seek(0)
+
 # Manual fields (always visible)
 st.markdown("#### Optional manual fields")
 manual_inputs: dict[str, str] = {}
 job_no: str | None = None
 
 manual_fields = ["Part No.", "Manufacturer Country", "Job Number"]
+TOOLTIPS = {
+    "Part No.": "Item part number written to every row.",
+    "Manufacturer Country": "Country of origin (e.g. China, Germany).",
+    "Job Number": "Stamped on PDF header, not in Excel.",
+}
 for col in manual_fields:
-    val = st.text_input(col, key=f"manual_{col}")
+    val = st.text_input(col, key=f"manual_{col}", help=TOOLTIPS.get(col, ""))
     if not val:
         continue
     if col == "Job Number":
@@ -271,19 +289,27 @@ if run:
         st.warning("Please upload a PDF first.")
         st.stop()
 
-    with st.spinner("Calling Fracto…"):
+    progress = st.progress(0.0, text="Uploading & extracting …")
+    try:
         pdf_bytes = pdf_file.read()
+        progress.progress(0.2)
         if job_no:
             pdf_bytes = stamp_job_number(pdf_bytes, job_no)
+        progress.progress(0.4)
 
         result = call_fracto(pdf_bytes, pdf_file.name)
+        progress.progress(0.8)
 
         buffer = io.BytesIO()
         write_excel_from_ocr([result], buffer, overrides=manual_inputs)
+        progress.progress(1.0, text="Done!")
         st.session_state["excel_bytes"]   = buffer.getvalue()
         st.session_state["excel_filename"] = pdf_file.name.replace(".pdf", "_ocr.xlsx")
-
-    st.success("Excel generated!")
+        st.toast("✅ Excel generated!", icon="🎉")
+    except Exception as exc:
+        st.toast(f"❌ Error: {exc}", icon="⚠️")
+        st.error(f"Processing failed: {exc}")
+        st.stop()
 
 # ── Preview & download ────────────────────────────────────────
 if st.session_state["excel_bytes"]:
