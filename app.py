@@ -179,7 +179,7 @@ pdf_file = st.file_uploader("Upload PDF", type=["pdf"])
 # Manual fields (always visible)
 manual_inputs = {}
 st.markdown("#### Optional manual fields")
-manual_columns = ["Job Number"]
+manual_columns = ["Part No.", "Manufacturer Country", "Job Number"]
 for col in manual_columns:
     if col in MAPPINGS:
         val = st.text_input(col, key=f"manual_{col}")
