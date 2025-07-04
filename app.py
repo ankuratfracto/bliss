@@ -2,6 +2,7 @@
 
 
 import io, textwrap
+import base64
 import streamlit as st
 import os
 import pandas as pd
@@ -261,12 +262,26 @@ if pdf_file:
     # Reset file pointer for later reading
     pdf_file.seek(0)
 
+    # Inline PDF preview (first 600 px tall iframe)
+    base64_pdf = base64.b64encode(pdf_file.getvalue()).decode("utf-8")
+    pdf_viewer = f"""
+        <iframe
+            src="data:application/pdf;base64,{base64_pdf}"
+            width="100%"
+            height="600"
+            style="border:1px solid #ccc; margin-top:16px;">
+        </iframe>
+    """
+    st.markdown(pdf_viewer, unsafe_allow_html=True)
+    # Reset pointer again for later processing
+    pdf_file.seek(0)
+
 # Manual fields (always visible)
 st.markdown("#### Optional manual fields")
 manual_inputs: dict[str, str] = {}
 job_no: str | None = None
 
-manual_fields = ["Part No.", "Manufacturer Country", "Job Number"]
+manual_fields = ["Job Number"]
 TOOLTIPS = {
     "Part No.": "Item part number written to every row.",
     "Manufacturer Country": "Country of origin (e.g. China, Germany).",
@@ -451,7 +466,7 @@ st.markdown('<h3 id="how">How it works</h3>', unsafe_allow_html=True)
 
 steps = [
     ("upload", "Upload", "Drag PDFs or images of invoices, POs, customs docs into the drop‑zone."),
-    ("cpu", "AI Extraction", "Vision models read tables, handwriting and stamps with 99 %+ accuracy."),
+    ("cpu", "AI Extraction", "Reads tables, handwriting and stamps with 99 %+ accuracy."),
     ("edit", "Review & Edit", "Adjust any field inline — spreadsheet‑style editor keeps you in control."),
     ("export", "Export", "Download ERP‑ready Excel or push straight into your system via API."),
 ]
