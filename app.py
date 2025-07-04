@@ -243,72 +243,53 @@ st.markdown("<div style='height:24px'></div>", unsafe_allow_html=True)
 
 st.markdown("## Smart‑OCR to ERP‑ready Excel")
 
+st.markdown('<h3 id="upload">1. Upload and process your PDF</h3>', unsafe_allow_html=True)
 
-# ── Three‑column layout ────────────────────────────────────────────
-import base64
-left_col, mid_col, right_col = st.columns([1, 2, 1], gap="medium")
+# ── Upload & Process ──────────────────────────────────────────
+# Upload widget
+pdf_file = st.file_uploader("Upload PDF", type=["pdf"])
 
-with mid_col:
-    st.markdown('<h3 id="upload">1. Upload and process your PDF</h3>', unsafe_allow_html=True)
+# Show thumbnail info after upload
+if pdf_file:
+    # Show file thumbnail info
+    file_size_kb = pdf_file.size / 1024
+    try:
+        page_count = len(PdfReader(pdf_file).pages)
+    except Exception:
+        page_count = "?"
+    st.info(f"**{pdf_file.name}**  •  {file_size_kb:,.1f} KB  •  {page_count} page(s)")
+    # Reset file pointer for later reading
+    pdf_file.seek(0)
 
-    # Upload widget
-    pdf_file = st.file_uploader("Upload PDF", type=["pdf"])
+# Manual fields (always visible)
+st.markdown("#### Optional manual fields")
+manual_inputs: dict[str, str] = {}
+job_no: str | None = None
 
-    # Manual fields
-    st.markdown("#### Optional manual fields")
-    manual_inputs: dict[str, str] = {}
-    job_no: str | None = None
+manual_fields = ["Part No.", "Manufacturer Country", "Job Number"]
+TOOLTIPS = {
+    "Part No.": "Item part number written to every row.",
+    "Manufacturer Country": "Country of origin (e.g. China, Germany).",
+    "Job Number": "Stamped on PDF header, not in Excel.",
+}
+for col in manual_fields:
+    val = st.text_input(col, key=f"manual_{col}", help=TOOLTIPS.get(col, ""))
+    if not val:
+        continue
+    if col == "Job Number":
+        job_no = val          # only stamp on PDF
+    else:
+        manual_inputs[col] = val  # Excel overrides
 
-    manual_fields = ["Job Number"]
-    TOOLTIPS = {
-        "Part No.": "Item part number written to every row.",
-        "Manufacturer Country": "Country of origin (e.g. China, Germany).",
-        "Job Number": "Stamped on PDF header, not in Excel.",
-    }
-    for col in manual_fields:
-        val = st.text_input(col, key=f"manual_{col}", help=TOOLTIPS.get(col, ""))
-        if not val:
-            continue
-        if col == "Job Number":
-            job_no = val
-        else:
-            manual_inputs[col] = val
+# Process button
+run = st.button("⚙️ Process PDF", disabled=pdf_file is None)
 
-    # Process button
-    run = st.button("⚙️ Process PDF", disabled=pdf_file is None)
-
-with right_col:
-    if pdf_file:
-        # Read bytes once for both preview and later processing
-        pdf_bytes = pdf_file.getvalue()
-        file_size_kb = len(pdf_bytes) / 1024
-        try:
-            page_count = len(PdfReader(io.BytesIO(pdf_bytes)).pages)
-        except Exception:
-            page_count = "?"
-        st.info(f"**{pdf_file.name}**  •  {file_size_kb:,.1f} KB  •  {page_count} page(s)")
-
-        base64_pdf = base64.b64encode(pdf_bytes).decode("utf-8")
-        pdf_viewer = f"""
-            <iframe
-                src="data:application/pdf;base64,{base64_pdf}"
-                width="100%"
-                height="600"
-                style="border:1px solid #ccc; margin-top:16px;">
-            </iframe>
-        """
-        st.markdown(pdf_viewer, unsafe_allow_html=True)
-
-        # Reset pointer for processing functions
-        pdf_file.seek(0)
-
-# Update process logic to use mid_col for progress bar
-if 'run' in locals() and run:
+if run:
     if not pdf_file:
         st.warning("Please upload a PDF first.")
         st.stop()
 
-    progress = mid_col.progress(0.0, text="Uploading & extracting …")
+    progress = st.progress(0.0, text="Uploading & extracting …")
     try:
         pdf_bytes = pdf_file.read()
         progress.progress(0.2)
