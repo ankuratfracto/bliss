@@ -372,33 +372,48 @@ with col3:
 
 st.markdown("---")
 
+
+# ── Card rendering helper ─────────────────────────────────────
+def render_card(icon: str, title: str, body: str, *, width="250px") -> str:
+    """Return HTML for a single card."""
+    return f"""
+        <div class="card" style="max-width:{width};">
+          <div class="card-icon">{icon}</div>
+          <h4>{title}</h4>
+          <p>{body}</p>
+        </div>
+    """
+
 # ── How it works ──────────────────────────────────────────────
-st.markdown("### How it works")
-how_cols = st.columns(4)
+st.markdown('<h3 id="how">How it works</h3>', unsafe_allow_html=True)
+
 steps = [
-    ("📤 Upload", "Drag PDFs or images of invoices, POs, customs docs into the drop‑zone."),
-    ("🤖 AI Extraction", "Fracto’s vision models read tables, handwriting and stamps with 99 %+ accuracy."),
-    ("📝 Review & Edit", "Adjust any field inline — our spreadsheet‑style editor keeps you in control."),
-    ("🔄 Export", "Download an ERP‑ready Excel or push straight into your system via API."),
+    ("📤", "Upload", "Drag PDFs or images of invoices, POs, customs docs into the drop‑zone."),
+    ("🤖", "AI Extraction", "Vision models read tables, handwriting and stamps with 99 %+ accuracy."),
+    ("📝", "Review & Edit", "Adjust any field inline — spreadsheet‑style editor keeps you in control."),
+    ("🔄", "Export", "Download ERP‑ready Excel or push straight into your system via API."),
 ]
-for (icon, title), col in zip(steps, how_cols):
+
+cols = st.columns(4)
+for col, (icon, title, body) in zip(cols, steps):
     with col:
-        st.markdown(f"#### {icon}<br>{title}", unsafe_allow_html=True)
+        col.markdown(render_card(icon, title, body), unsafe_allow_html=True)
 
 st.markdown("---")
 
 # ── Popular use‑cases ─────────────────────────────────────────
-st.markdown("### Popular use‑cases")
-uc1, uc2, uc3 = st.columns(3)
-with uc1:
-    st.markdown("#### 🛳️ Import Logistics")
-    st.write("Bill of lading, packing lists, HS‑code mapping — ready for customs clearance.")
-with uc2:
-    st.markdown("#### 🏭 Manufacturing")
-    st.write("Supplier invoices and QC sheets flow directly into SAP or Oracle with serial‑level traceability.")
-with uc3:
-    st.markdown("#### 💸 Finance & AP")
-    st.write("Reconcile bank statements and purchase invoices 10× faster with zero manual key‑in.")
+st.markdown('<h3 id="usecases">Popular use‑cases</h3>', unsafe_allow_html=True)
+
+use_cases = [
+    ("🛳️", "Import Logistics", "Bills of lading, packing lists, HS‑code mapping — ready for customs clearance."),
+    ("🏭", "Manufacturing", "Supplier invoices and QC sheets flow directly into SAP/Oracle with serial‑level traceability."),
+    ("💸", "Finance & AP", "Reconcile bank statements and purchase invoices 10× faster with zero manual key‑in."),
+]
+
+uc_cols = st.columns(3)
+for col, (icon, title, body) in zip(uc_cols, use_cases):
+    with col:
+        col.markdown(render_card(icon, title, body, width="280px"), unsafe_allow_html=True)
 
 st.markdown("---")
 
