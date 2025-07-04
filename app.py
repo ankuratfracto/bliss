@@ -177,14 +177,20 @@ st.markdown("### 1. Upload and process your PDF")
 pdf_file = st.file_uploader("Upload PDF", type=["pdf"])
 
 # Manual fields (always visible)
-manual_inputs = {}
 st.markdown("#### Optional manual fields")
-manual_columns = ["Part No.", "Manufacturer Country", "Job Number"]
-for col in manual_columns:
-    if col in MAPPINGS:
-        val = st.text_input(col, key=f"manual_{col}")
-        if val:
-            manual_inputs[col] = val
+manual_inputs: dict[str, str] = {}
+job_no: str | None = None
+
+for col in ["Part No.", "Manufacturer Country", "Job Number"]:
+    if col not in MAPPINGS and col != "Job Number":
+        continue  # skip columns not in Excel mapping
+    val = st.text_input(col, key=f"manual_{col}")
+    if not val:
+        continue
+    if col == "Job Number":
+        job_no = val               # keep separately for PDF stamp
+    else:
+        manual_inputs[col] = val    # pass to Excel overrides
 
 # Process button
 run = st.button("⚙️ Process PDF", disabled=pdf_file is None)
@@ -196,7 +202,6 @@ if run:
 
     with st.spinner("Calling Fracto…"):
         pdf_bytes = pdf_file.read()
-        job_no    = manual_inputs.get("Job Number")
         if job_no:
             pdf_bytes = stamp_job_number(pdf_bytes, job_no)
 
