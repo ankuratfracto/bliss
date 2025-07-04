@@ -5,6 +5,12 @@ import streamlit as st
 import os
 from mcc import call_fracto, write_excel_from_ocr, _extract_rows, MAPPINGS
 
+# ── Session keys ─────────────────────────────────────────────
+if "excel_bytes" not in st.session_state:
+    st.session_state["excel_bytes"] = None
+if "excel_filename" not in st.session_state:
+    st.session_state["excel_filename"] = ""
+
 # Ensure FRACTO_API_KEY is available for mcc.call_fracto
 if "FRACTO_API_KEY" in st.secrets:
     os.environ["FRACTO_API_KEY"] = st.secrets["FRACTO_API_KEY"]
@@ -36,25 +42,28 @@ if run:
         st.stop()
 
     with st.spinner("Calling Fracto…"):
-        # Read bytes & call OCR
         pdf_bytes = pdf_file.read()
         result    = call_fracto(pdf_bytes, pdf_file.name)
-        rows      = _extract_rows(result["data"])
 
-        # Build Excel in-memory
         buffer = io.BytesIO()
         write_excel_from_ocr([result], buffer, overrides=manual_inputs)
-        buffer.seek(0)
+        st.session_state["excel_bytes"]   = buffer.getvalue()
+        st.session_state["excel_filename"] = pdf_file.name.replace(".pdf", "_ocr.xlsx")
 
-    st.success("Done! Download your file:")
-    st.download_button("⬇️ Download Excel",
-                       data=buffer,
-                       file_name=pdf_file.name.replace(".pdf", "_ocr.xlsx"),
-                       mime=("application/vnd.openxmlformats-officedocument."
-                             "spreadsheetml.sheet"))
-    # Optional: preview first few rows right in the app
+    st.success("Excel generated! You can download or preview it below.")
+
+# ── Download + Preview section (persists across reruns) ──────
+if st.session_state["excel_bytes"]:
+    st.download_button(
+        "⬇️ Download Excel",
+        data=st.session_state["excel_bytes"],
+        file_name=st.session_state["excel_filename"],
+        mime=("application/vnd.openxmlformats-officedocument."
+              "spreadsheetml.sheet"),
+        key="download_excel",
+    )
+
     if st.checkbox("Preview first few rows"):
         import pandas as pd
-        df = pd.read_excel(buffer)
+        df = pd.read_excel(io.BytesIO(st.session_state["excel_bytes"]))
         st.dataframe(df.head())
-        buffer.seek(0)
