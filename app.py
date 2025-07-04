@@ -266,7 +266,7 @@ st.markdown("#### Optional manual fields")
 manual_inputs: dict[str, str] = {}
 job_no: str | None = None
 
-manual_fields = ["Part No.", "Manufacturer Country", "Job Number"]
+manual_fields = ["Job Number"]
 TOOLTIPS = {
     "Part No.": "Item part number written to every row.",
     "Manufacturer Country": "Country of origin (e.g. China, Germany).",
