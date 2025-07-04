@@ -11,6 +11,9 @@ if "excel_bytes" not in st.session_state:
     st.session_state["excel_bytes"] = None
 if "excel_filename" not in st.session_state:
     st.session_state["excel_filename"] = ""
+if "edited_excel_bytes" not in st.session_state:
+    st.session_state["edited_excel_bytes"] = None
+    st.session_state["edited_filename"] = ""
 
 # Ensure FRACTO_API_KEY is available for mcc.call_fracto
 if "FRACTO_API_KEY" in st.secrets:
@@ -73,16 +76,22 @@ if st.session_state["excel_bytes"]:
         key="editable_grid",
     )
 
-    # 3) Save + download edited file
-    if st.button("💾 Save edits & download"):
+    # 3) Save edits
+    if st.button("💾 Save edits"):
         out_buf = io.BytesIO()
         edited_df.to_excel(out_buf, index=False, engine="openpyxl")
-        edited_bytes = out_buf.getvalue()
+        st.session_state["edited_excel_bytes"] = out_buf.getvalue()
+        st.session_state["edited_filename"] = st.session_state["excel_filename"].replace(
+            ".xlsx", "_edited.xlsx"
+        )
+        st.success("Edits saved — scroll below to download the .xlsx file.")
 
+    # 4) Download edited Excel (persistent button)
+    if st.session_state["edited_excel_bytes"]:
         st.download_button(
             "⬇️ Download edited Excel",
-            data=edited_bytes,
-            file_name=st.session_state["excel_filename"].replace(".xlsx", "_edited.xlsx"),
+            data=st.session_state["edited_excel_bytes"],
+            file_name=st.session_state["edited_filename"],
             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
             key="download_edited",
         )
