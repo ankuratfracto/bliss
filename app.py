@@ -131,6 +131,35 @@ st.markdown(f"""
             color: #222222 !important;
         }}
     }}
+    .card-container {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+        margin-bottom: 1rem;
+    }
+    .card {
+        flex: 1 1 200px;
+        background: #FFFFFF;
+        border: 1px solid #E0E0E0;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        padding: 1rem;
+        text-align: center;
+    }
+    .card-icon {
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+    }
+    .card h4 {
+        margin: 0.2rem 0 0.5rem 0;
+        color: #003B9C;
+        font-weight: 600;
+    }
+    .card p {
+        font-size: 0.9rem;
+        line-height: 1.3rem;
+        margin: 0;
+    }
     </style>
 """, unsafe_allow_html=True)
 
@@ -296,44 +325,36 @@ if st.session_state["excel_bytes"]:
 
 st.markdown("---")
 
-# ── Intro tagline ─────────────────────────────────────────────
-st.markdown(
-    "<h4 style='color:#003B9C;font-weight:400;'>Automate imports. Eliminate re‑typing. Focus on growth.</h4>",
-    unsafe_allow_html=True,
-)
-st.write(
-    "Fracto converts your shipping invoices, customs docs and purchase orders "
-    "into ERP‑ready spreadsheets in seconds — complete with your business rules, "
-    "manual fields and validation checks."
-)
-
-# ── Benefits grid ─────────────────────────────────────────────
-st.markdown("### Why choose **Fracto Imports**?")
-col1, col2, col3 = st.columns(3)
-with col1:
-    st.markdown("#### 🚀 10× Faster")
-    st.write("Upload → processed Excel in under a minute, even for multi‑page PDFs.")
-with col2:
-    st.markdown("#### 🔍 Error‑free")
-    st.write("AI‑assisted extraction + your manual overrides ensure 99.9 % accuracy.")
-with col3:
-    st.markdown("#### 🔗 Fits Your ERP")
-    st.write("Column mapping matches your import template out‑of‑the‑box.")
-
-st.markdown("---")
-
 # ── How it works ──────────────────────────────────────────────
 st.markdown("### How it works")
-how_cols = st.columns(4)
-steps = [
-    ("📤 Upload", "Drag PDFs or images of invoices, POs, customs docs into the drop‑zone."),
-    ("🤖 AI Extraction", "Fracto’s vision models read tables, handwriting and stamps with 99 %+ accuracy."),
-    ("📝 Review & Edit", "Adjust any field inline — our spreadsheet‑style editor keeps you in control."),
-    ("🔄 Export", "Download an ERP‑ready Excel or push straight into your system via API."),
-]
-for (icon, title), col in zip(steps, how_cols):
-    with col:
-        st.markdown(f"#### {icon}<br>{title}", unsafe_allow_html=True)
+
+st.markdown(
+    '''
+    <div class="card-container">
+      <div class="card">
+        <div class="card-icon">📤</div>
+        <h4>Upload</h4>
+        <p>Drag PDFs or images of invoices, POs, customs docs into the drop‑zone.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🤖</div>
+        <h4>AI&nbsp;Extraction</h4>
+        <p>Fracto’s vision models read tables, handwriting and stamps with&nbsp;99 %+ accuracy.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">📝</div>
+        <h4>Review&nbsp;&amp;&nbsp;Edit</h4>
+        <p>Adjust any field inline — our spreadsheet‑style editor keeps you in control.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🔄</div>
+        <h4>Export</h4>
+        <p>Download an ERP‑ready Excel or push straight into your system via API.</p>
+      </div>
+    </div>
+    ''',
+    unsafe_allow_html=True,
+)
 
 st.markdown("---")
 
