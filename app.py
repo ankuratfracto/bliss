@@ -218,16 +218,26 @@ if "FRACTO_API_KEY" in st.secrets:
 # ── Hero / intro ──────────────────────────────────────────────
 st.markdown(
     '''
-    <h2 style="color:#003B9C;font-weight:600;margin-bottom:0.2rem;">Automate imports. Eliminate re‑typing.</h2>
-    <p style="font-size:1.05rem;line-height:1.5rem;margin-bottom:1.5rem;">
-      Fracto converts your shipping invoices, customs docs and purchase orders into<br>
-      ERP‑ready spreadsheets in seconds — complete with your business rules and validation checks.
-    </p>
+    <div style="text-align:center;margin-bottom:32px;">
+      <h2 style="color:#003B9C;font-weight:600;margin:0;">Automate imports. Eliminate re‑typing.</h2>
+      <p style="font-size:1.05rem;line-height:1.5rem;margin:8px 0 24px;">
+        Fracto converts your shipping invoices, customs docs and purchase orders into<br>
+        ERP‑ready spreadsheets in seconds — complete with your business rules and validation checks.
+      </p>
+      <a href="#upload" style="
+          background:#00AB6B;
+          color:#fff;
+          padding:10px 22px;
+          border-radius:6px;
+          text-decoration:none;
+          font-weight:500;
+          transition:background .2s;">
+        Get started
+      </a>
+    </div>
     ''',
     unsafe_allow_html=True,
 )
-# 24px spacing before uploader
-st.markdown("<div style='height:24px'></div>", unsafe_allow_html=True)
 
 st.markdown("## Smart‑OCR to ERP‑ready Excel")
 
