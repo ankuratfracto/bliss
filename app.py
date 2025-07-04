@@ -184,6 +184,19 @@ st.markdown(
 # Logo banner at the top
 st.image("fractologo.jpeg", width=180)
 
+# ── Sticky navigation bar ────────────────────────────────────
+st.markdown(
+    """
+    <div class="topnav">
+      <a href="#upload">Upload</a>
+      <a href="#workflow">Workflow</a>
+      <a href="#why">Why&nbsp;Fracto</a>
+      <a href="#usecases">Use‑cases</a>
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
+
 # ── Session keys ─────────────────────────────────────────────
 if "excel_bytes" not in st.session_state:
     st.session_state["excel_bytes"] = None
@@ -368,7 +381,7 @@ if st.session_state["excel_bytes"]:
 st.markdown("---")
 
 # ── Benefits grid ─────────────────────────────────────────────
-st.markdown("### Why choose **Fracto Imports**?")
+st.markdown('<h3 id="why">Why choose <strong>Fracto Imports</strong>?</h3>', unsafe_allow_html=True)
 col1, col2, col3 = st.columns(3)
 with col1:
     st.markdown("#### 🚀 10× Faster")
@@ -394,8 +407,8 @@ def render_card(icon: str, title: str, body: str, *, width="250px") -> str:
         </div>
     """
 
-# ── How it works ──────────────────────────────────────────────
-st.markdown('<h3 id="how">How it works</h3>', unsafe_allow_html=True)
+ # ── How it works ──────────────────────────────────────────────
+st.markdown('<h3 id="workflow">How it works</h3>', unsafe_allow_html=True)
 
 steps = [
     ("📤", "Upload", "Drag PDFs or images of invoices, POs, customs docs into the drop‑zone."),
