@@ -3,3 +3,5 @@ openpyxl
 requests
 pyyaml
 matplotlib
+PyPDF2
+reportlab

@@ -19,6 +19,37 @@ from openpyxl.styles import Font, Alignment, Border, Side, PatternFill
 import yaml
 
 import requests
+from PyPDF2 import PdfReader, PdfWriter
+from reportlab.pdfgen import canvas
+
+# ─── PDF Stamping Helper ──────────────────────────────────────────────
+def stamp_job_number(src_bytes: bytes, job_no: str) -> bytes:
+    """
+    Return new PDF bytes with 'Job Number: <job_no>' stamped
+    at top‑left of every page (non‑destructive overlay).
+    """
+    if not job_no:
+        return src_bytes  # nothing to do
+
+    # create a one‑page overlay PDF in memory
+    overlay_buf = io.BytesIO()
+    c = canvas.Canvas(overlay_buf, pagesize=(595, 842))  # A4 points
+    c.setFont("Helvetica-Bold", 10)
+    c.drawString(40, 820, f"Job Number: {job_no}")
+    c.save()
+    overlay_buf.seek(0)
+
+    overlay_reader = PdfReader(overlay_buf)
+    base_reader    = PdfReader(io.BytesIO(src_bytes))
+    writer         = PdfWriter()
+
+    for page in base_reader.pages:
+        page.merge_page(overlay_reader.pages[0])
+        writer.add_page(page)
+
+    out_buf = io.BytesIO()
+    writer.write(out_buf)
+    return out_buf.getvalue()
 
 # ─── CONFIG ──────────────────────────────────────────────────────────────
 FRACTO_ENDPOINT = "https://prod-ml.fracto.tech//upload-file-smart-ocr"

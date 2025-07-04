@@ -6,7 +6,7 @@ import streamlit as st
 import os
 import pandas as pd
 import matplotlib.pyplot as plt
-from mcc import call_fracto, write_excel_from_ocr, _extract_rows, MAPPINGS
+from mcc import call_fracto, write_excel_from_ocr, _extract_rows, MAPPINGS, stamp_job_number
 
 # ── Page config (must be first Streamlit command) ─────────────
 st.set_page_config(
@@ -196,7 +196,11 @@ if run:
 
     with st.spinner("Calling Fracto…"):
         pdf_bytes = pdf_file.read()
-        result    = call_fracto(pdf_bytes, pdf_file.name)
+        job_no    = manual_inputs.get("Job Number")
+        if job_no:
+            pdf_bytes = stamp_job_number(pdf_bytes, job_no)
+
+        result = call_fracto(pdf_bytes, pdf_file.name)
 
         buffer = io.BytesIO()
         write_excel_from_ocr([result], buffer, overrides=manual_inputs)
