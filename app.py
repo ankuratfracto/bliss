@@ -49,6 +49,28 @@ st.markdown(f"""
         border: 1px solid #0066FF !important;   /* Fracto primary on focus */
         box-shadow: 0 0 0 2px rgba(0,102,255,0.2) !important;
     }}
+    /* Force light theme when user is in dark mode */
+    @media (prefers-color-scheme: dark) {{
+        .stApp {{
+            background: #FFFFFF !important;
+        }}
+        h1, h2, h3, h4, h5, h6, p, label, span, div, input, textarea {{
+            color: #222222 !important;
+        }}
+        /* keep our primary buttons */
+        button[kind="primary"] {{
+            background-color: #0066FF !important;
+            color: #fff !important;
+        }}
+        button[kind="primary"]:hover {{
+            background-color: #003B9C !important;
+        }}
+        /* inputs */
+        .stTextInput > div > div > input {{
+            background-color: #ffffff !important;
+            color: #222222 !important;
+        }}
+    }}
     </style>
 """, unsafe_allow_html=True)
 
