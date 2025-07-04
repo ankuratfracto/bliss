@@ -252,14 +252,29 @@ pdf_file = st.file_uploader("Upload PDF", type=["pdf"])
 
 # Show thumbnail info after upload
 if pdf_file:
-    # Show file thumbnail info
-    file_size_kb = pdf_file.size / 1024
+    # Read PDF bytes once
+    pdf_bytes     = pdf_file.read()
+    file_size_kb  = len(pdf_bytes) / 1024
     try:
-        page_count = len(PdfReader(pdf_file).pages)
+        page_count = len(PdfReader(io.BytesIO(pdf_bytes)).pages)
     except Exception:
         page_count = "?"
     st.info(f"**{pdf_file.name}**  •  {file_size_kb:,.1f} KB  •  {page_count} page(s)")
-    # Reset file pointer for later reading
+
+    # Inline PDF preview
+    import base64
+    base64_pdf = base64.b64encode(pdf_bytes).decode("utf-8")
+    pdf_viewer = f"""
+        <iframe
+            src="data:application/pdf;base64,{base64_pdf}"
+            width="100%"
+            height="600"
+            style="border:1px solid #ccc; margin-top:16px;">
+        </iframe>
+    """
+    st.markdown(pdf_viewer, unsafe_allow_html=True)
+
+    # Reset pointer so later processing can read from UploadedFile again
     pdf_file.seek(0)
 
     # Inline PDF preview (first 600 px tall iframe)
