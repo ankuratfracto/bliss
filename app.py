@@ -218,7 +218,7 @@ st.markdown("#### Optional manual fields")
 manual_inputs: dict[str, str] = {}
 job_no: str | None = None
 
-manual_fields = ["Part No.", "Manufacturer Country", "Job Number"]
+manual_fields = ["Job Number"]
 for col in manual_fields:
     val = st.text_input(col, key=f"manual_{col}")
     if not val:
