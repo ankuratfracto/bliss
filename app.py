@@ -440,6 +440,9 @@ logo_files = [
     "clients/kuhoo.png",
     "clients/ODeX.png",
     "clients/accomation.png",
+    "clients/jaikisan.png",
+    "clients/121Finance.png",
+    "clients/NBHC.png",
 ]
 st.markdown(build_logo_strip(logo_files), unsafe_allow_html=True)
 st.markdown("---")
