@@ -76,11 +76,12 @@ if st.session_state["excel_bytes"]:
     # 3) Save + download edited file
     if st.button("💾 Save edits & download"):
         out_buf = io.BytesIO()
-        edited_df.to_excel(out_buf, index=False)
-        out_buf.seek(0)
+        edited_df.to_excel(out_buf, index=False, engine="openpyxl")
+        edited_bytes = out_buf.getvalue()
+
         st.download_button(
             "⬇️ Download edited Excel",
-            data=out_buf,
+            data=edited_bytes,
             file_name=st.session_state["excel_filename"].replace(".xlsx", "_edited.xlsx"),
             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
             key="download_edited",
