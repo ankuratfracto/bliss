@@ -6,6 +6,37 @@ import os
 import pandas as pd
 from mcc import call_fracto, write_excel_from_ocr, _extract_rows, MAPPINGS
 
+# ── Fracto branding styles ────────────────────────────────────
+FRACTO_PRIMARY   = "#0066FF"   # adjust if brand palette differs
+FRACTO_DARK      = "#003B9C"
+FRACTO_LIGHT_BG  = "#F5F8FF"
+
+st.markdown(f"""
+    <style>
+    /* Page background */
+    .stApp {{
+        background: {FRACTO_LIGHT_BG};
+    }}
+    /* Primary buttons */
+    button[kind="primary"] {{
+        background-color: {FRACTO_PRIMARY} !important;
+        color: #fff !important;
+        border: 0 !important;
+    }}
+    button[kind="primary"]:hover {{
+        background-color: {FRACTO_DARK} !important;
+        color: #fff !important;
+    }}
+    /* Header text color */
+    h1 {{
+        color: {FRACTO_DARK};
+    }}
+    </style>
+""", unsafe_allow_html=True)
+
+# Logo banner at the top
+st.image("https://www.fracto.tech/logo.svg", width=180)
+
 # ── Session keys ─────────────────────────────────────────────
 if "excel_bytes" not in st.session_state:
     st.session_state["excel_bytes"] = None
@@ -23,7 +54,7 @@ if "FRACTO_API_KEY" in st.secrets:
 st.set_page_config(page_title="PDF → Smart-OCR → Excel",
                    page_icon="📄", layout="wide")
 
-st.title("Smart-OCR to ERP-ready Excel")
+st.markdown("## Smart‑OCR to ERP‑ready Excel")
 
 # 1) Upload widget
 pdf_file = st.file_uploader("Upload PDF", type=["pdf"])
