@@ -270,16 +270,20 @@ if st.session_state["excel_bytes"]:
         st.markdown("#### Top SKUs by Qty")
         top_qty = (
             view_df.groupby("Part No.")["Qty"]
-            .sum()
+            .sum(numeric_only=True)
             .sort_values(ascending=False)
             .head(10)
         )
-        fig, ax = plt.subplots()
-        top_qty.plot(kind="barh", ax=ax)
-        ax.invert_yaxis()
-        ax.set_xlabel("Qty")
-        ax.set_ylabel("Part No.")
-        st.pyplot(fig)
+
+        if top_qty.empty or top_qty.shape[0] < 1:
+            st.info("No Qty data available to plot.")
+        else:
+            fig, ax = plt.subplots()
+            top_qty.plot(kind="barh", ax=ax)
+            ax.invert_yaxis()
+            ax.set_xlabel("Qty")
+            ax.set_ylabel("Part No.")
+            st.pyplot(fig)
 
 st.markdown("---")
 
