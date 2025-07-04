@@ -23,35 +23,45 @@ from PyPDF2 import PdfReader, PdfWriter
 from reportlab.pdfgen import canvas
 
 # ─── PDF Stamping Helper ──────────────────────────────────────────────
-def stamp_job_number(src_bytes: bytes, job_no: str) -> bytes:
+def stamp_job_number(src_bytes: bytes, job_no: str, margin: int = 20) -> bytes:
     """
-    Return new PDF bytes with 'Job Number: <job_no>' stamped
-    at the top‑left margin of every page (non‑destructive overlay),
-    adapting to each page's actual size.
+    Return new PDF bytes with an extra *margin* (pt) added to the top
+    of every page, then stamps 'Job Number: <job_no>' inside that space.
+
+    This ensures the stamp never covers the original page content.
     """
     if not job_no:
-        return src_bytes  # nothing to do
+        return src_bytes
+
+    from PyPDF2 import PdfReader, PdfWriter, Transformation, PageObject
 
     base_reader = PdfReader(io.BytesIO(src_bytes))
     writer      = PdfWriter()
 
-    for page in base_reader.pages:
-        # Get page size in points
-        w = float(page.mediabox.width)
-        h = float(page.mediabox.height)
+    for orig_page in base_reader.pages:
+        w = float(orig_page.mediabox.width)
+        h = float(orig_page.mediabox.height)
 
-        # Create overlay matching **this page** size
+        # 1️⃣  Create a new blank page taller by *margin*
+        new_page = PageObject.create_blank_page(None, w, h + margin)
+
+        # 2️⃣  Shift original page content down by `margin`
+        orig_page.add_transformation(Transformation().translate(tx=0, ty=-margin))
+        new_page.merge_page(orig_page)
+
+        # 3️⃣  Create text overlay the same enlarged size
         overlay_buf = io.BytesIO()
-        c = canvas.Canvas(overlay_buf, pagesize=(w, h))
+        c = canvas.Canvas(overlay_buf, pagesize=(w, h + margin))
         c.setFont("Helvetica-Bold", 10)
-        # 40 pt from left, 20 pt from top
-        c.drawString(40, h - 20, f"Job Number: {job_no}")
+        c.drawString(40, h + margin - 15, f"Job Number: {job_no}")
         c.save()
         overlay_buf.seek(0)
 
         overlay_reader = PdfReader(overlay_buf)
-        page.merge_page(overlay_reader.pages[0])
-        writer.add_page(page)
+        new_page.merge_page(overlay_reader.pages[0])
+
+        # 4️⃣  Add to writer
+        writer.add_page(new_page)
 
     out_buf = io.BytesIO()
     writer.write(out_buf)
