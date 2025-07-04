@@ -148,41 +148,32 @@ st.markdown(f"""
         transition: box-shadow 0.3s ease-in-out;
     }}
     /* Scrolling logo strip */
-    .logo-strip-wrapper{
+    .logo-strip-wrapper{{
         max-width:880px;
         margin:24px auto;
         overflow:hidden;
-    }
-    .logo-strip{
+    }}
+    .logo-strip{{
         display:inline-block;
         white-space:nowrap;
         animation:logoscroll 20s linear infinite; /* doubled speed */
-    }
-    .logo-strip img{
+    }}
+    .logo-strip img{{
         height:48px;
         margin:0 32px;
         vertical-align:middle;
-    }
-    @keyframes logoscroll{
-        0%   {transform:translateX(0);}
-        100% {transform:translateX(-50%);}
-    }
+    }}
+    @keyframes logoscroll{{
+        0%   {{transform:translateX(0);}}
+        100% {{transform:translateX(-50%);}}
+    }}
     </style>
 """, unsafe_allow_html=True)
 # ── Clients logo strip ───────────────────────────────────────
-import base64
-from pathlib import Path
 def build_logo_strip(logo_paths: list[str]) -> str:
-    tags = ""
-    for rel_path in logo_paths:
-        abs_path = Path(__file__).parent / rel_path
-        if abs_path.exists():
-            b64 = base64.b64encode(abs_path.read_bytes()).decode("utf-8")
-            mime = "image/svg+xml" if rel_path.endswith(".svg") else "image/png"
-            tags += f"<img src='data:{mime};base64,{b64}' alt='' />"
+    tags = "".join(f"<img src='{p}' alt='' />" for p in logo_paths)
     # Duplicate sequence for seamless scroll
-    inner = f"<div class='logo-strip'>{tags}{tags}</div>"
-    return f"<div class='logo-strip-wrapper'>{inner}</div>"
+    return f"<div class='logo-strip'>{tags}{tags}</div>"
 
 st.markdown(
     """
