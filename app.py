@@ -6,8 +6,6 @@ import streamlit as st
 import os
 import pandas as pd
 import matplotlib.pyplot as plt
-import base64
-from pathlib import Path
 from mcc import call_fracto, write_excel_from_ocr, _extract_rows, MAPPINGS, stamp_job_number
 from PyPDF2 import PdfReader
 
@@ -150,37 +148,31 @@ st.markdown(f"""
         transition: box-shadow 0.3s ease-in-out;
     }}
     /* Scrolling logo strip */
-    .logo-strip {{
-        overflow: hidden;
-        white-space: nowrap;
-        box-sizing: border-box;
-        animation: logoscroll 40s linear infinite;
-        margin: 24px 0;
-    }}
-    .logo-strip img{{
+    .logo-strip-wrapper{
+        max-width:880px;
+        margin:24px auto;
+        overflow:hidden;
+    }
+    .logo-strip{
+        display:inline-block;
+        white-space:nowrap;
+        animation:logoscroll 20s linear infinite; /* doubled speed */
+    }
+    .logo-strip img{
         height:48px;
         margin:0 32px;
-        vertical-align: middle;
-        display:inline-block;
-        filter: grayscale(100%);
-        opacity:0.8;
-        transition: opacity .2s;
-    }}
-    .logo-strip img:hover{{
-        filter: grayscale(0%);
-        opacity:1;
-    }}
-    @keyframes logoscroll{{
-        0%   {{transform: translateX(0);}}
-        100% {{transform: translateX(-50%);}}
-    }}
+        vertical-align:middle;
+    }
+    @keyframes logoscroll{
+        0%   {transform:translateX(0);}
+        100% {transform:translateX(-50%);}
+    }
     </style>
 """, unsafe_allow_html=True)
 # ── Clients logo strip ───────────────────────────────────────
+import base64
+from pathlib import Path
 def build_logo_strip(logo_paths: list[str]) -> str:
-    """
-    Return a scrolling div with base64‑embedded logos.
-    """
     tags = ""
     for rel_path in logo_paths:
         abs_path = Path(__file__).parent / rel_path
@@ -188,8 +180,9 @@ def build_logo_strip(logo_paths: list[str]) -> str:
             b64 = base64.b64encode(abs_path.read_bytes()).decode("utf-8")
             mime = "image/svg+xml" if rel_path.endswith(".svg") else "image/png"
             tags += f"<img src='data:{mime};base64,{b64}' alt='' />"
-    # Duplicate for seamless scroll
-    return f"<div class='logo-strip'>{tags}{tags}</div>"
+    # Duplicate sequence for seamless scroll
+    inner = f"<div class='logo-strip'>{tags}{tags}</div>"
+    return f"<div class='logo-strip-wrapper'>{inner}</div>"
 
 st.markdown(
     """
@@ -439,7 +432,6 @@ st.markdown("---")
 st.markdown("### Trusted by global importers")
 logo_files = [
     "clients/kuhoo.png",
-    # add more e.g. "clients/maersk.svg"
 ]
 st.markdown(build_logo_strip(logo_files), unsafe_allow_html=True)
 st.markdown("---")
