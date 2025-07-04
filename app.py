@@ -5,6 +5,7 @@ import io, textwrap
 import streamlit as st
 import os
 import pandas as pd
+import matplotlib.pyplot as plt
 from mcc import call_fracto, write_excel_from_ocr, _extract_rows, MAPPINGS
 
 # ── Page config (must be first Streamlit command) ─────────────
@@ -249,6 +250,36 @@ if st.session_state["excel_bytes"]:
             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
             key="download_edited",
         )
+
+    # ── Quick stats & visualisations ───────────────────────────
+    view_df = edited_df if st.session_state.get("edited_excel_bytes") else df
+
+    st.markdown("### 3. Quick stats")
+    k1, k2 = st.columns(2)
+    k1.metric("Total rows", view_df.shape[0])
+    k2.metric("Blank cells", int(view_df.isna().sum().sum()))
+
+    # Optionally show numeric totals if columns exist
+    if "Qty" in view_df.columns:
+        st.metric("Total Qty", f"{view_df['Qty'].sum():,.0f}")
+    if "Unit Price" in view_df.columns:
+        st.metric("Sum Unit Price", f"{view_df['Unit Price'].sum():,.0f}")
+
+    # ── Top Part Numbers by Qty chart ─────────────────────────
+    if {"Part No.", "Qty"}.issubset(view_df.columns):
+        st.markdown("#### Top SKUs by Qty")
+        top_qty = (
+            view_df.groupby("Part No.")["Qty"]
+            .sum()
+            .sort_values(ascending=False)
+            .head(10)
+        )
+        fig, ax = plt.subplots()
+        top_qty.plot(kind="barh", ax=ax)
+        ax.invert_yaxis()
+        ax.set_xlabel("Qty")
+        ax.set_ylabel("Part No.")
+        st.pyplot(fig)
 
 st.markdown("---")
 
