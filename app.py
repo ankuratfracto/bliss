@@ -64,6 +64,22 @@ if "edited_excel_bytes" not in st.session_state:
     st.session_state["edited_excel_bytes"] = None
     st.session_state["edited_filename"] = ""
 
+# ── Simple username/password gate ─────────────────────────────
+if "authenticated" not in st.session_state:
+    st.session_state["authenticated"] = False
+
+if not st.session_state["authenticated"]:
+    st.subheader("🔐 Login required")
+    uname = st.text_input("Username")
+    pword = st.text_input("Password", type="password")
+    if st.button("Login"):
+        if uname == "mcc" and pword == "mcc@99":
+            st.session_state["authenticated"] = True
+            st.experimental_rerun()
+        else:
+            st.error("Invalid credentials")
+    st.stop()   # prevent the rest of the app from rendering
+
 # Ensure FRACTO_API_KEY is available for mcc.call_fracto
 if "FRACTO_API_KEY" in st.secrets:
     os.environ["FRACTO_API_KEY"] = st.secrets["FRACTO_API_KEY"]
