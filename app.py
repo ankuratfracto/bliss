@@ -68,14 +68,14 @@ st.markdown("### 1. Upload and process your PDF")
 # Upload widget
 pdf_file = st.file_uploader("Upload PDF", type=["pdf"])
 
-# Manual fields
-with st.expander("Optional manual fields"):
-    manual_inputs = {}
-    for col in ["Part No.", "Manufacturer Country"]:
-        if col in MAPPINGS:
-            val = st.text_input(col)
-            if val:
-                manual_inputs[col] = val
+# Manual fields (always visible)
+manual_inputs = {}
+st.markdown("#### Optional manual fields")
+for col in ["Part No.", "Manufacturer Country"]:
+    if col in MAPPINGS:
+        val = st.text_input(col, key=f"manual_{col}")
+        if val:
+            manual_inputs[col] = val
 
 # Process button
 run = st.button("⚙️ Process PDF", disabled=pdf_file is None)
@@ -116,8 +116,18 @@ if st.session_state["excel_bytes"]:
     )
 
     if st.button("💾 Save edits"):
+        # Load original workbook to preserve formatting
+        from openpyxl import load_workbook
+        wb_orig = load_workbook(io.BytesIO(st.session_state["excel_bytes"]))
+        ws      = wb_orig.active
+
+        # Overwrite data rows (assumes header is row 1)
+        for r_idx, (_, row) in enumerate(edited_df.iterrows(), start=2):
+            for c_idx, value in enumerate(row, start=1):
+                ws.cell(row=r_idx, column=c_idx, value=value)
+
         out_buf = io.BytesIO()
-        edited_df.to_excel(out_buf, index=False, engine="openpyxl")
+        wb_orig.save(out_buf)
         st.session_state["edited_excel_bytes"] = out_buf.getvalue()
         st.session_state["edited_filename"] = st.session_state["excel_filename"].replace(
             ".xlsx", "_edited.xlsx"
