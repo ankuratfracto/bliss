@@ -16,7 +16,7 @@ st.set_page_config(
 )
 
 # ── Fracto branding styles ────────────────────────────────────
-FRACTO_PRIMARY   = "#0066FF"   # adjust if brand palette differs
+FRACTO_PRIMARY   = "#00AB6B"   # adjust if brand palette differs
 FRACTO_DARK      = "#003B9C"
 FRACTO_LIGHT_BG  = "#F5F8FF"
 
@@ -155,12 +155,17 @@ st.markdown(
     }
     .card {
         flex: 1 1 200px;
-        background: #FFFFFF;
+        background: #F6F8FA;                /* softer grey */
         border: 1px solid #E0E0E0;
-        border-radius: 8px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-        padding: 1rem;
+        border-radius: 12px;                /* rounder corners */
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        padding: 1rem;                      /* ~16 px */
         text-align: center;
+        transition: transform .2s ease, box-shadow .2s ease;
+    }
+    .card:hover{
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
     }
     .card-icon {
         font-size: 2rem;
