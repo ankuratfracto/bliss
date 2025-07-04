@@ -49,6 +49,17 @@ st.markdown(f"""
         border: 1px solid #0066FF !important;   /* Fracto primary on focus */
         box-shadow: 0 0 0 2px rgba(0,102,255,0.2) !important;
     }}
+    /* File uploader box */
+    .stFileUploader > div > div {{
+        background-color: #ffffff !important;
+        border: 1px solid #CCCCCC !important;
+        border-radius: 4px !important;
+        color: #222222 !important;
+    }}
+    /* Fix inside text in uploader */
+    .stFileUploader label {{
+        color: #222222 !important;
+    }}
     /* Force light theme when user is in dark mode */
     @media (prefers-color-scheme: dark) {{
         .stApp {{
@@ -68,6 +79,15 @@ st.markdown(f"""
         /* inputs */
         .stTextInput > div > div > input {{
             background-color: #ffffff !important;
+            color: #222222 !important;
+        }}
+        /* uploader stays light */
+        .stFileUploader > div > div {{
+            background-color: #ffffff !important;
+            border: 1px solid #CCCCCC !important;
+            color: #222222 !important;
+        }}
+        .stFileUploader label {{
             color: #222222 !important;
         }}
     }}
