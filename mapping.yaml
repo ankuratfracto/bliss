@@ -1,0 +1,156 @@
+excel_export:
+  template_path: "./templates/customs_invoice_template.xlsx"   # optional
+  sheet_name: "Sheet1"                                         # optional
+
+  mappings:
+    "Invoice No.": Invoice_Number
+    "Item No.": Serial_Number
+    "Product Description": Product_Description
+    "Qty": Qty
+    "Qty Unit": Qty_Unit
+    "Unit Price": Unit_Price
+    "Part No.": part_no
+    "Item Type": item_type
+    "RITC": RITC
+    "CTH": CTH
+    "BCD Notn No.": bcd_notn_no
+    "BCD Notn SrNo.": bcd_notn_srno
+    "Edu. Cess Notn.": edu_cess_notn
+    "Edu. Cess Notn SrNo.": edu_cess_notn_srno
+    "Sec & Higher Ed. Cess Notn.": higher_edu_cess_notn
+    "Sec & Higher Ed. Cess Notn SrNo.": higher_edu_cess_notn_srno
+    "AID Cess Notn.": aid_cess_notn
+    "AID Cess Notn SrNo.": aid_cess_notn_srno
+    "Social Welfare Surcharge Notn.": sws_notn
+    "Social Welfare Surcharge Notn SrNo.": sws_notn_srno
+    "Custom Health Cess Notn No.": health_cess_notn_no
+    "Custom Health Cess Notn SrNo.": health_cess_notn_srno
+    "IGST Notn.": igst_notn
+    "IGST Notn Sr No.": igst_notn_srno
+    "Compensation Notn No.": comp_cess_notn_no
+    "Compensation Sr No.": comp_cess_srno
+    "IGST Exemption Flag": igst_exempt_flag
+    "IGST Exemption Notn No.": igst_exempt_notn_no
+    "IGST Exemption Notn SrNo.": igst_exempt_notn_srno
+    "GST Comp Cess Exmp Flag": comp_cess_exempt_flag
+    "GST Comp Cess Exmp Notn No.": comp_cess_exempt_notn_no
+    "GST Comp Cess Exmp Notn SrNo.": comp_cess_exempt_notn_srno
+    "CETH": ceth
+    "MRP Status": mrp_status
+    "RSP Notification No.": rsp_notn_no
+    "RSP Notification SrNo.": rsp_notn_srno
+    "MRP Amount": mrp_amount
+    "General Description": general_description
+    "Accessories": accessories
+    "Accessories Status": accessories_status
+    "Brand": brand
+    "Model": model
+    "End Use": end_use
+    "Country of Origin": country_of_origin
+    "Policy Para No.": policy_para_no
+    "Policy Para Year": policy_para_year
+    "Manufacturer Name": manufacturer_name
+    "Manufacturer Address": manufacturer_address
+    "Manufacturer Country": manufacturer_country
+    "Exim Scheme": exim_scheme
+    "Scheme Notn No.": scheme_notn_no
+    "Scheme Notn SrNo.": scheme_notn_srno
+    "Duty Exemption": duty_exemption
+    "Licence Registration No.": licence_reg_no
+    "Licence Registration Date": licence_reg_date
+    "Licence No.": licence_no
+    "Licence Date": licence_date
+    "Licence Item SrNo.": licence_item_srno
+    "Licence Port": licence_port
+    "Licence CIF Value": licence_cif_value
+    "Licence Debit Duty Amt": licence_debit_duty_amt
+    "Aggregate Duty Notn No.": agg_duty_notn_no
+    "Aggregate Duty Notn SrNo.": agg_duty_notn_srno
+    "SAPTA Notn No.": sapta_notn_no
+    "SAPTA Notn SrNo.": sapta_notn_srno
+    "Excise GSI Notn No.": excise_gsi_notn_no
+    "Excise GSI Notn SrNo.": excise_gsi_notn_srno
+    "Excise SAD Notn No.": excise_sad_notn_no
+    "Excise SAD Notn SrNo.": excise_sad_notn_srno
+    "Excise TTA Notn No.": excise_tta_notn_no
+    "Excise TTA Notn SrNo.": excise_tta_notn_srno
+    "Road and Infra Cess Notn.": road_infra_cess_notn
+    "Road and Infra Cess SrNo.": road_infra_cess_srno
+    "Re-Import SB No.": reimport_sb_no
+    "Re-Import SB Date": reimport_sb_date
+    "Re-Import Port of Export": reimport_port_export
+    "Re-Import Invoice Sr. No.": reimport_inv_srno
+    "Re-Import Item Sr. No.": reimport_item_srno
+    "Re-Import Notn No.": reimport_notn_no
+    "Re-Import Notn SrNo.": reimport_notn_srno
+    "Re-Import Export Freight Amt": reimport_export_freight
+    "Re-Import Export Insurance Amt": reimport_export_insurance
+    "Anti-Dumping Notn No.": ad_notn_no
+    "Anti-Dumping Notn SrNo.": ad_notn_srno
+    "Item Sr No.": item_srno
+    "CTH Sr No.": cth_srno
+    "Supplier SrNo.": supplier_srno
+    "Anti-Dumping Method": ad_method
+    "Duty": duty
+    "Anti-Dumping Qty": ad_qty
+    "Anti-Dumping Unit": ad_unit
+    "SW-Type1": sw_type1
+    "SW-Qualifier1": sw_qualifier1
+    "SW-Code1": sw_code1
+    "SW-Text1": sw_text1
+    "SW-Qty1": sw_qty1
+    "SW-QtyUnit1": sw_qtyunit1
+    "SW-Type2": sw_type2
+    "SW-Qualifier2": sw_qualifier2
+    "SW-Code2": sw_code2
+    "SW-Text2": sw_text2
+    "SW-Qty2": sw_qty2
+    "SW-QtyUnit2": sw_qtyunit2
+    "SW-Type3": sw_type3
+    "SW-Qualifier3": sw_qualifier3
+    "SW-Code3": sw_code3
+    "SW-Text3": sw_text3
+    "SW-Qty3": sw_qty3
+    "SW-QtyUnit3": sw_qtyunit3
+    "SW-Type4": sw_type4
+    "SW-Qualifier4": sw_qualifier4
+    "SW-Code4": sw_code4
+    "SW-Text4": sw_text4
+    "SW-Qty4": sw_qty4
+    "SW-QtyUnit4": sw_qtyunit4
+    "SW-Type5": sw_type5
+    "SW-Qualifier5": sw_qualifier5
+    "SW-Code5": sw_code5
+    "SW-Text5": sw_text5
+    "SW-Qty5": sw_qty5
+    "SW-QtyUnit5": sw_qtyunit5
+    "SW-Type6": sw_type6
+    "SW-Qualifier6": sw_qualifier6
+    "SW-Code6": sw_code6
+    "SW-Text6": sw_text6
+    "SW-Qty6": sw_qty6
+    "SW-QtyUnit6": sw_qtyunit6
+    "SW-Type7": sw_type7
+    "SW-Qualifier7": sw_qualifier7
+    "SW-Code7": sw_code7
+    "SW-Text7": sw_text7
+    "SW-Qty7": sw_qty7
+    "SW-QtyUnit7": sw_qtyunit7
+    "SW-Type8": sw_type8
+    "SW-Qualifier8": sw_qualifier8
+    "SW-Code8": sw_code8
+    "SW-Text8": sw_text8
+    "SW-Qty8": sw_qty8
+    "SW-QtyUnit8": sw_qtyunit8
+    "SW-Type9": sw_type9
+    "SW-Qualifier9": sw_qualifier9
+    "SW-Code9": sw_code9
+    "SW-Text9": sw_text9
+    "SW-Qty9": sw_qty9
+    "SW-QtyUnit9": sw_qtyunit9
+    "SW-Type10": sw_type10
+    "SW-Qualifier10": sw_qualifier10
+    "SW-Code10": sw_code10
+    "SW-Text10": sw_text10
+    "SW-Qty10": sw_qty10
+    "SW-QtyUnit10": sw_qtyunit10
