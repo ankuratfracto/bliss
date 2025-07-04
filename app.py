@@ -423,6 +423,8 @@ st.markdown("---")
 st.markdown("### Trusted by global importers")
 logo_files = [
     "clients/kuhoo.png",
+    "clients/ODeX.png",
+    "clients/accomation.png",
 ]
 st.markdown(build_logo_strip(logo_files), unsafe_allow_html=True)
 st.markdown("---")
