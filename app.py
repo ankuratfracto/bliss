@@ -1,4 +1,4 @@
-# <file name=1 path=/Users/ankurgupta/myprojects/mcc/app.py># app.py
+# app.py
 
 
 import io, textwrap
@@ -16,8 +16,8 @@ st.set_page_config(
 )
 
 # ── Fracto branding styles ────────────────────────────────────
-FRACTO_PRIMARY   = "#0066FF"   # adjust if brand palette differs
-FRACTO_DARK      = "#003B9C"
+FRACTO_PRIMARY   = "#00AB6B"   # adjust if brand palette differs
+FRACTO_DARK      = "#00895A"
 FRACTO_LIGHT_BG  = "#F5F8FF"
 
 st.markdown(f"""
@@ -57,8 +57,8 @@ st.markdown(f"""
         border-radius: 4px !important;
     }}
     .stTextInput > div > div > input:focus {{
-        border: 1px solid #0066FF !important;   /* Fracto primary on focus */
-        box-shadow: 0 0 0 2px rgba(0,102,255,0.2) !important;
+        border: 1px solid #00AB6B !important;   /* Fracto primary on focus */
+        box-shadow: 0 0 0 2px rgba(0,171,107,0.2) !important;
     }}
     /* File uploader box */
     .stFileUploader > div > div {{
@@ -78,11 +78,11 @@ st.markdown(f"""
     }}
     /* Buttons in login section */
     button, .stButton button {{
-        background-color: #0066FF !important;
+        background-color: #00AB6B !important;
         color: #ffffff !important;
     }}
     button:hover, .stButton button:hover {{
-        background-color: #003B9C !important;
+        background-color: #00895A !important;
         color: #ffffff !important;
     }}
     /* Labels stay dark text */
@@ -120,11 +120,11 @@ st.markdown(f"""
         }}
         /* keep our primary buttons */
         button[kind="primary"] {{
-            background-color: #0066FF !important;
+            background-color: #00AB6B !important;
             color: #fff !important;
         }}
         button[kind="primary"]:hover {{
-            background-color: #003B9C !important;
+            background-color: #00895A !important;
         }}
         /* inputs */
         .stTextInput > div > div > input {{
@@ -141,6 +141,11 @@ st.markdown(f"""
             color: #222222 !important;
         }}
     }}
+    /* Force hover shadow on cards */
+    .card:hover {{
+        box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        transition: box-shadow 0.3s ease-in-out;
+    }}
     </style>
 """, unsafe_allow_html=True)
 
@@ -155,10 +160,10 @@ st.markdown(
     }
     .card {
         flex: 1 1 200px;
-        background: #FFFFFF;
+        background: #F6F8FA;
         border: 1px solid #E0E0E0;
-        border-radius: 8px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        border-radius: 12px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         padding: 1rem;
         text-align: center;
     }
@@ -175,7 +180,7 @@ st.markdown(
         font-size:16px;
         font-weight:600;
         margin:4px 0 8px 0;
-        color: #003B9C;
+        color: #00895A;
     }
     .card p{
         font-size:13px;
@@ -224,7 +229,7 @@ if "FRACTO_API_KEY" in st.secrets:
 # ── Hero / intro ──────────────────────────────────────────────
 st.markdown(
     '''
-    <h2 style="color:#003B9C;font-weight:600;margin-bottom:0.2rem;">Automate imports. Eliminate re‑typing.</h2>
+    <h2 style="color:#00895A;font-weight:600;margin-bottom:0.2rem;">Automate imports. Eliminate re‑typing.</h2>
     <p style="font-size:1.05rem;line-height:1.5rem;margin-bottom:1.5rem;">
       Fracto converts your shipping invoices, customs docs and purchase orders into<br>
       ERP‑ready spreadsheets in seconds — complete with your business rules and validation checks.
@@ -248,7 +253,7 @@ st.markdown("#### Optional manual fields")
 manual_inputs: dict[str, str] = {}
 job_no: str | None = None
 
-manual_fields = ["Job Number"]
+manual_fields = ["Part No.", "Manufacturer Country", "Job Number"]
 for col in manual_fields:
     val = st.text_input(col, key=f"manual_{col}")
     if not val:
@@ -433,7 +438,7 @@ st.markdown("---")
 # ── Footer ────────────────────────────────────────────────────
 st.markdown(
     "<div style='text-align:center;font-size:0.85rem;padding-top:2rem;color:#666;'>"
-    "Made with ❤️ by <a href='https://www.fracto.tech' style='color:#0066FF;' target='_blank'>Fracto</a>"
+    "Made with ❤️ by <a href='https://www.fracto.tech' style='color:#00AB6B;' target='_blank'>Fracto</a>"
     "</div>",
     unsafe_allow_html=True,
 )
