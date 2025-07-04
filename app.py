@@ -2,7 +2,6 @@
 
 
 import io, textwrap
-import base64
 import streamlit as st
 import os
 import pandas as pd
@@ -244,82 +243,72 @@ st.markdown("<div style='height:24px'></div>", unsafe_allow_html=True)
 
 st.markdown("## Smart‑OCR to ERP‑ready Excel")
 
-st.markdown('<h3 id="upload">1. Upload and process your PDF</h3>', unsafe_allow_html=True)
 
-# ── Upload & Process ──────────────────────────────────────────
-# Upload widget
-pdf_file = st.file_uploader("Upload PDF", type=["pdf"])
+# ── Three‑column layout ────────────────────────────────────────────
+import base64
+left_col, mid_col, right_col = st.columns([1, 2, 1], gap="medium")
 
-# Show thumbnail info after upload
-if pdf_file:
-    # Read PDF bytes once
-    pdf_bytes     = pdf_file.read()
-    file_size_kb  = len(pdf_bytes) / 1024
-    try:
-        page_count = len(PdfReader(io.BytesIO(pdf_bytes)).pages)
-    except Exception:
-        page_count = "?"
-    st.info(f"**{pdf_file.name}**  •  {file_size_kb:,.1f} KB  •  {page_count} page(s)")
+with mid_col:
+    st.markdown('<h3 id="upload">1. Upload and process your PDF</h3>', unsafe_allow_html=True)
 
-    # Inline PDF preview
-    import base64
-    base64_pdf = base64.b64encode(pdf_bytes).decode("utf-8")
-    pdf_viewer = f"""
-        <iframe
-            src="data:application/pdf;base64,{base64_pdf}"
-            width="100%"
-            height="600"
-            style="border:1px solid #ccc; margin-top:16px;">
-        </iframe>
-    """
-    st.markdown(pdf_viewer, unsafe_allow_html=True)
+    # Upload widget
+    pdf_file = st.file_uploader("Upload PDF", type=["pdf"])
 
-    # Reset pointer so later processing can read from UploadedFile again
-    pdf_file.seek(0)
+    # Manual fields
+    st.markdown("#### Optional manual fields")
+    manual_inputs: dict[str, str] = {}
+    job_no: str | None = None
 
-    # Inline PDF preview (first 600 px tall iframe)
-    base64_pdf = base64.b64encode(pdf_file.getvalue()).decode("utf-8")
-    pdf_viewer = f"""
-        <iframe
-            src="data:application/pdf;base64,{base64_pdf}"
-            width="100%"
-            height="600"
-            style="border:1px solid #ccc; margin-top:16px;">
-        </iframe>
-    """
-    st.markdown(pdf_viewer, unsafe_allow_html=True)
-    # Reset pointer again for later processing
-    pdf_file.seek(0)
+    manual_fields = ["Job Number"]
+    TOOLTIPS = {
+        "Part No.": "Item part number written to every row.",
+        "Manufacturer Country": "Country of origin (e.g. China, Germany).",
+        "Job Number": "Stamped on PDF header, not in Excel.",
+    }
+    for col in manual_fields:
+        val = st.text_input(col, key=f"manual_{col}", help=TOOLTIPS.get(col, ""))
+        if not val:
+            continue
+        if col == "Job Number":
+            job_no = val
+        else:
+            manual_inputs[col] = val
 
-# Manual fields (always visible)
-st.markdown("#### Optional manual fields")
-manual_inputs: dict[str, str] = {}
-job_no: str | None = None
+    # Process button
+    run = st.button("⚙️ Process PDF", disabled=pdf_file is None)
 
-manual_fields = ["Job Number"]
-TOOLTIPS = {
-    "Part No.": "Item part number written to every row.",
-    "Manufacturer Country": "Country of origin (e.g. China, Germany).",
-    "Job Number": "Stamped on PDF header, not in Excel.",
-}
-for col in manual_fields:
-    val = st.text_input(col, key=f"manual_{col}", help=TOOLTIPS.get(col, ""))
-    if not val:
-        continue
-    if col == "Job Number":
-        job_no = val          # only stamp on PDF
-    else:
-        manual_inputs[col] = val  # Excel overrides
+with right_col:
+    if pdf_file:
+        # Read bytes once for both preview and later processing
+        pdf_bytes = pdf_file.getvalue()
+        file_size_kb = len(pdf_bytes) / 1024
+        try:
+            page_count = len(PdfReader(io.BytesIO(pdf_bytes)).pages)
+        except Exception:
+            page_count = "?"
+        st.info(f"**{pdf_file.name}**  •  {file_size_kb:,.1f} KB  •  {page_count} page(s)")
 
-# Process button
-run = st.button("⚙️ Process PDF", disabled=pdf_file is None)
+        base64_pdf = base64.b64encode(pdf_bytes).decode("utf-8")
+        pdf_viewer = f"""
+            <iframe
+                src="data:application/pdf;base64,{base64_pdf}"
+                width="100%"
+                height="600"
+                style="border:1px solid #ccc; margin-top:16px;">
+            </iframe>
+        """
+        st.markdown(pdf_viewer, unsafe_allow_html=True)
 
-if run:
+        # Reset pointer for processing functions
+        pdf_file.seek(0)
+
+# Update process logic to use mid_col for progress bar
+if 'run' in locals() and run:
     if not pdf_file:
         st.warning("Please upload a PDF first.")
         st.stop()
 
-    progress = st.progress(0.0, text="Uploading & extracting …")
+    progress = mid_col.progress(0.0, text="Uploading & extracting …")
     try:
         pdf_bytes = pdf_file.read()
         progress.progress(0.2)
