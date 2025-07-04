@@ -427,11 +427,7 @@ st.markdown("---")
 # ── Clients logo strip ───────────────────────────────────────
 st.markdown("### Trusted by global importers")
 logo_files = [
-    "clients/maersk.png",
-    "clients/ge.png",
-    "clients/volvo.png",
-    "clients/ikea.png",
-    "clients/siemens.png",
+    "kuhoo.png",
 ]
 st.markdown(build_logo_strip(logo_files), unsafe_allow_html=True)
 st.markdown("---")
