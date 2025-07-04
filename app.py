@@ -43,7 +43,7 @@ st.markdown(f"""
 """, unsafe_allow_html=True)
 
 # Logo banner at the top
-st.image("https://www.fracto.tech/logo.svg", width=180)
+st.image("fractologo.jpeg", width=180)
 
 # ── Session keys ─────────────────────────────────────────────
 if "excel_bytes" not in st.session_state:
