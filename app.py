@@ -60,6 +60,45 @@ st.markdown(f"""
     .stFileUploader label {{
         color: #222222 !important;
     }}
+    /* Force background and text for all blocks */
+    html, body, .stApp, .block-container {{
+        background-color: #FFFFFF !important;
+        color: #222222 !important;
+    }}
+    /* Buttons in login section */
+    button, .stButton button {{
+        background-color: #0066FF !important;
+        color: #ffffff !important;
+    }}
+    button:hover, .stButton button:hover {{
+        background-color: #003B9C !important;
+        color: #ffffff !important;
+    }}
+    /* Labels stay dark text */
+    label, .stMarkdown, .stSubheader, .stHeader, .stTextInput label {{
+        color: #222222 !important;
+    }}
+    /* Password input */
+    input[type="password"] {{
+        background-color: #FFFFFF !important;
+        color: #222222 !important;
+        border: 1px solid #CCCCCC !important;
+    }}
+    /* Duplicate overrides in dark‑mode query */
+    @media (prefers-color-scheme: dark) {{
+        html, body, .stApp, .block-container {{
+            background-color: #FFFFFF !important;
+            color: #222222 !important;
+        }}
+        label, .stMarkdown, .stSubheader, .stHeader, .stTextInput label {{
+            color: #222222 !important;
+        }}
+        input[type="password"] {{
+            background-color: #FFFFFF !important;
+            color: #222222 !important;
+            border: 1px solid #CCCCCC !important;
+        }}
+    }}
     /* Force light theme when user is in dark mode */
     @media (prefers-color-scheme: dark) {{
         .stApp {{
