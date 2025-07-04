@@ -157,7 +157,7 @@ if not st.session_state["authenticated"]:
     if st.button("Login"):
         if uname == "mcc" and pword == "mcc@99":
             st.session_state["authenticated"] = True
-            st.experimental_rerun()
+            st.rerun()
         else:
             st.error("Invalid credentials")
     st.stop()   # prevent the rest of the app from rendering
@@ -216,7 +216,7 @@ if st.session_state["excel_bytes"]:
     )
 
     df = pd.read_excel(io.BytesIO(st.session_state["excel_bytes"]))
-    edited_df = st.experimental_data_editor(
+    edited_df = st.data_editor(
         df,
         num_rows="dynamic",
         use_container_width=True,
