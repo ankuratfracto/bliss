@@ -205,9 +205,23 @@ if "FRACTO_API_KEY" in st.secrets:
 
 
 
+# ── Hero / intro ──────────────────────────────────────────────
+st.markdown(
+    '''
+    <h2 style="color:#003B9C;font-weight:600;margin-bottom:0.2rem;">Automate imports. Eliminate re‑typing.</h2>
+    <p style="font-size:1.05rem;line-height:1.5rem;margin-bottom:1.5rem;">
+      Fracto converts your shipping invoices, customs docs and purchase orders into<br>
+      ERP‑ready spreadsheets in seconds — complete with your business rules and validation checks.
+    </p>
+    ''',
+    unsafe_allow_html=True,
+)
+# 24px spacing before uploader
+st.markdown("<div style='height:24px'></div>", unsafe_allow_html=True)
+
 st.markdown("## Smart‑OCR to ERP‑ready Excel")
 
-st.markdown("### 1. Upload and process your PDF")
+st.markdown('<h3 id="upload">1. Upload and process your PDF</h3>', unsafe_allow_html=True)
 
 # ── Upload & Process ──────────────────────────────────────────
 # Upload widget
@@ -332,17 +346,6 @@ if st.session_state["excel_bytes"]:
             st.pyplot(fig)
 
 st.markdown("---")
-
-# ── Intro tagline ─────────────────────────────────────────────
-st.markdown(
-    "<h4 style='color:#003B9C;font-weight:400;'>Automate imports. Eliminate re‑typing. Focus on growth.</h4>",
-    unsafe_allow_html=True,
-)
-st.write(
-    "Fracto converts your shipping invoices, customs docs and purchase orders "
-    "into ERP‑ready spreadsheets in seconds — complete with your business rules, "
-    "manual fields and validation checks."
-)
 
 # ── Benefits grid ─────────────────────────────────────────────
 st.markdown("### Why choose **Fracto Imports**?")
