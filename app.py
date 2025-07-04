@@ -62,6 +62,79 @@ if "FRACTO_API_KEY" in st.secrets:
 
 st.markdown("## Smart‑OCR to ERP‑ready Excel")
 
+st.markdown("### 1. Upload and process your PDF")
+
+# ── Upload & Process ──────────────────────────────────────────
+# Upload widget
+pdf_file = st.file_uploader("Upload PDF", type=["pdf"])
+
+# Manual fields
+with st.expander("Optional manual fields"):
+    manual_inputs = {}
+    for col in ["Part No.", "Manufacturer Country"]:
+        if col in MAPPINGS:
+            val = st.text_input(col)
+            if val:
+                manual_inputs[col] = val
+
+# Process button
+run = st.button("⚙️ Process PDF", disabled=pdf_file is None)
+
+if run:
+    if not pdf_file:
+        st.warning("Please upload a PDF first.")
+        st.stop()
+
+    with st.spinner("Calling Fracto…"):
+        pdf_bytes = pdf_file.read()
+        result    = call_fracto(pdf_bytes, pdf_file.name)
+
+        buffer = io.BytesIO()
+        write_excel_from_ocr([result], buffer, overrides=manual_inputs)
+        st.session_state["excel_bytes"]   = buffer.getvalue()
+        st.session_state["excel_filename"] = pdf_file.name.replace(".pdf", "_ocr.xlsx")
+
+    st.success("Excel generated!")
+
+# ── Preview & download ────────────────────────────────────────
+if st.session_state["excel_bytes"]:
+    st.markdown("### 2. Review and export")
+    st.download_button(
+        "⬇️ Download original Excel",
+        data=st.session_state["excel_bytes"],
+        file_name=st.session_state["excel_filename"],
+        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        key="download_original",
+    )
+
+    df = pd.read_excel(io.BytesIO(st.session_state["excel_bytes"]))
+    edited_df = st.experimental_data_editor(
+        df,
+        num_rows="dynamic",
+        use_container_width=True,
+        key="editable_grid",
+    )
+
+    if st.button("💾 Save edits"):
+        out_buf = io.BytesIO()
+        edited_df.to_excel(out_buf, index=False, engine="openpyxl")
+        st.session_state["edited_excel_bytes"] = out_buf.getvalue()
+        st.session_state["edited_filename"] = st.session_state["excel_filename"].replace(
+            ".xlsx", "_edited.xlsx"
+        )
+        st.success("Edits saved — scroll below to download the .xlsx file.")
+
+    if st.session_state.get("edited_excel_bytes"):
+        st.download_button(
+            "⬇️ Download edited Excel",
+            data=st.session_state["edited_excel_bytes"],
+            file_name=st.session_state["edited_filename"],
+            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            key="download_edited",
+        )
+
+st.markdown("---")
+
 # ── Intro tagline ─────────────────────────────────────────────
 st.markdown(
     "<h4 style='color:#003B9C;font-weight:400;'>Automate imports. Eliminate re‑typing. Focus on growth.</h4>",
@@ -72,7 +145,6 @@ st.write(
     "into ERP‑ready spreadsheets in seconds — complete with your business rules, "
     "manual fields and validation checks."
 )
-st.markdown("---")
 
 # ── Benefits grid ─────────────────────────────────────────────
 st.markdown("### Why choose **Fracto Imports**?")
@@ -118,77 +190,6 @@ with uc3:
     st.write("Reconcile bank statements and purchase invoices 10× faster with zero manual key‑in.")
 
 st.markdown("---")
-
-# 1) Upload widget
-pdf_file = st.file_uploader("Upload PDF", type=["pdf"])
-
-# 2) Extra manual fields
-st.subheader("Manual fields (applied to every row)")
-manual_inputs = {}
-for col in ["Part No.", "Manufacturer Country"]:
-    if col in MAPPINGS:
-        val = st.text_input(col)
-        if val:
-            manual_inputs[col] = val
-
-# 3) Process button
-run = st.button("Process PDF", disabled=pdf_file is None)
-
-if run:
-    if not pdf_file:
-        st.warning("Please upload a PDF first.")
-        st.stop()
-
-    with st.spinner("Calling Fracto…"):
-        pdf_bytes = pdf_file.read()
-        result    = call_fracto(pdf_bytes, pdf_file.name)
-
-        buffer = io.BytesIO()
-        write_excel_from_ocr([result], buffer, overrides=manual_inputs)
-        st.session_state["excel_bytes"]   = buffer.getvalue()
-        st.session_state["excel_filename"] = pdf_file.name.replace(".pdf", "_ocr.xlsx")
-
-    st.success("Excel generated! You can download or preview it below.")
-
-# ── Download + Editable Preview section ───────────────────────
-if st.session_state["excel_bytes"]:
-    # 1) Download original
-    st.download_button(
-        "⬇️ Download original Excel",
-        data=st.session_state["excel_bytes"],
-        file_name=st.session_state["excel_filename"],
-        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        key="download_original",
-    )
-
-    # 2) Editable grid
-    df = pd.read_excel(io.BytesIO(st.session_state["excel_bytes"]))
-    edited_df = st.experimental_data_editor(
-        df,
-        num_rows="dynamic",
-        use_container_width=True,
-        key="editable_grid",
-    )
-
-    # 3) Save edits
-    if st.button("💾 Save edits"):
-        out_buf = io.BytesIO()
-        edited_df.to_excel(out_buf, index=False, engine="openpyxl")
-        st.session_state["edited_excel_bytes"] = out_buf.getvalue()
-        st.session_state["edited_filename"] = st.session_state["excel_filename"].replace(
-            ".xlsx", "_edited.xlsx"
-        )
-        st.success("Edits saved — scroll below to download the .xlsx file.")
-
-    # 4) Download edited Excel (persistent button)
-    if st.session_state["edited_excel_bytes"]:
-        st.download_button(
-            "⬇️ Download edited Excel",
-            data=st.session_state["edited_excel_bytes"],
-            file_name=st.session_state["edited_filename"],
-            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-            key="download_edited",
-        )
 
 # ── Footer ────────────────────────────────────────────────────
 st.markdown(
