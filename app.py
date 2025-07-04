@@ -59,7 +59,35 @@ if "FRACTO_API_KEY" in st.secrets:
     os.environ["FRACTO_API_KEY"] = st.secrets["FRACTO_API_KEY"]
 
 
+
 st.markdown("## Smart‑OCR to ERP‑ready Excel")
+
+# ── Intro tagline ─────────────────────────────────────────────
+st.markdown(
+    "<h4 style='color:#003B9C;font-weight:400;'>Automate imports. Eliminate re‑typing. Focus on growth.</h4>",
+    unsafe_allow_html=True,
+)
+st.write(
+    "Fracto converts your shipping invoices, customs docs and purchase orders "
+    "into ERP‑ready spreadsheets in seconds — complete with your business rules, "
+    "manual fields and validation checks."
+)
+st.markdown("---")
+
+# ── Benefits grid ─────────────────────────────────────────────
+st.markdown("### Why choose **Fracto Imports**?")
+col1, col2, col3 = st.columns(3)
+with col1:
+    st.markdown("#### 🚀 10× Faster")
+    st.write("Upload → processed Excel in under a minute, even for multi‑page PDFs.")
+with col2:
+    st.markdown("#### 🔍 Error‑free")
+    st.write("AI‑assisted extraction + your manual overrides ensure 99.9 % accuracy.")
+with col3:
+    st.markdown("#### 🔗 Fits Your ERP")
+    st.write("Column mapping matches your import template out‑of‑the‑box.")
+
+st.markdown("---")
 
 # 1) Upload widget
 pdf_file = st.file_uploader("Upload PDF", type=["pdf"])
@@ -131,3 +159,11 @@ if st.session_state["excel_bytes"]:
             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
             key="download_edited",
         )
+
+# ── Footer ────────────────────────────────────────────────────
+st.markdown(
+    "<div style='text-align:center;font-size:0.85rem;padding-top:2rem;color:#666;'>"
+    "Made with ❤️ by <a href='https://www.fracto.tech' style='color:#0066FF;' target='_blank'>Fracto</a>"
+    "</div>",
+    unsafe_allow_html=True,
+)
