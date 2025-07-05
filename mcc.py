@@ -72,7 +72,7 @@ FRACTO_ENDPOINT = "https://prod-ml.fracto.tech//upload-file-smart-ocr"
 API_KEY         = os.getenv("FRACTO_API_KEY", "KUS-KUS-D09D77-709841-JXR4YETC")
 PARSER_APP_ID   = "Tua4jrrYqLmCi7jt"
 MODEL_ID        = "gv1"
-EXTRA_ACCURACY  = "false"
+EXTRA_ACCURACY  = "true"
 
 # ──────────────────────────────────────────────────────────────────────────
 
