@@ -453,6 +453,17 @@ logo_files = [
     "clients/121Finance.png",
     "clients/NBHC.png",
     "clients/MCC.png",
+    "clients/navata.png",
+    "clients/trukker.png",
+    "clients/turno.png",
+    "clients/petpooja.png",
+    "clients/freightfox.png",
+    "clients/presolv.png",
+    "clients/equal.png",
+    "clients/ambit.png",
+    "clients/khfl.png",
+    "clients/pssc.png",
+    "clients/symbo.png",
 ]
 st.markdown(build_logo_strip(logo_files), unsafe_allow_html=True)
 st.markdown("---")
