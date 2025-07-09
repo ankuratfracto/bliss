@@ -328,6 +328,7 @@ for col in manual_fields:
     else:
         manual_inputs[col] = val  # Excel overrides
 
+# Formats come straight from mapping.yaml ("Format 1", "Format 2", …)
 format_names = list(FORMATS.keys())
 selected_format_key = st.selectbox("Select Excel output format", format_names)
 selected_format_cfg = FORMATS[selected_format_key]
