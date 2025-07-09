@@ -83,37 +83,63 @@ logging.basicConfig(
     datefmt="%H:%M:%S",
 )
 
-def _load_mapping():
-    script_dir = Path(__file__).parent
+
+def _load_formats():
+    """
+    Parse mapping.yaml and return a dict[str, dict] keyed by human‑friendly
+    format name → {'mappings':…, 'template_path':…, 'sheet_name':…}
+    and gracefully support three YAML layouts:
+      ① legacy `excel_export` (single format)
+      ② multiple `excel_export_*` siblings
+      ③ modern `formats: { … }`
+    """
+    script_dir   = Path(__file__).parent
     mapping_file = script_dir / "mapping.yaml"
+    formats: dict[str, dict] = {}
 
-    mappings = {}
-    template_path = None
-    sheet_name = None
+    if not mapping_file.exists():
+        return formats
 
-    if mapping_file.exists():
-        with open(mapping_file, "r", encoding="utf-8") as f:
-            data = yaml.safe_load(f) or {}
+    with open(mapping_file, "r", encoding="utf-8") as f:
+        data = yaml.safe_load(f) or {}
 
-        # Support both layouts:
-        # 1. Wrapped under `excel_export`
-        # 2. Flat mapping-only YAML
-        if isinstance(data, dict) and "excel_export" in data:
-            excel_cfg = data.get("excel_export", {})
-            mappings       = excel_cfg.get("mappings", {})
-            template_path  = excel_cfg.get("template_path")
-            sheet_name     = excel_cfg.get("sheet_name")
-        else:
-            # Assume the YAML itself is the mapping dict
-            mappings = data
+    # ③ modern block
+    if isinstance(data, dict) and "formats" in data:
+        for name, cfg in data["formats"].items():
+            if isinstance(cfg, dict):
+                formats[str(name)] = cfg
 
-        # Make template_path absolute if it exists
-        if template_path:
-            template_path = (script_dir / template_path).expanduser().resolve()
+    # ① legacy – keep as "Customs Invoice"
+    if isinstance(data, dict) and "excel_export" in data:
+        formats["Customs Invoice"] = data["excel_export"]
 
-    return mappings, template_path, sheet_name
+    # ② multiple excel_export_* blocks
+    for key, val in (data.items() if isinstance(data, dict) else []):
+        if key.startswith("excel_export_") and isinstance(val, dict):
+            pretty = key.replace("excel_export_", "").replace("_", " ").title()
+            formats[pretty] = val
 
-MAPPINGS, TEMPLATE_PATH, SHEET_NAME = _load_mapping()
+    # Fallback: raw mapping dict alone
+    if not formats and isinstance(data, dict):
+        formats["Customs Invoice"] = {"mappings": data}
+
+    # Normalise paths & ensure each entry has mappings dict
+    for cfg in formats.values():
+        if "mappings" not in cfg:
+            cfg["mappings"] = {}
+        if tp := cfg.get("template_path"):
+            cfg["template_path"] = (script_dir / tp).expanduser().resolve()
+
+    return formats
+
+FORMATS = _load_formats()
+DEFAULT_FORMAT = next(iter(FORMATS)) if FORMATS else "Customs Invoice"
+
+# Keep legacy single‑format globals for existing callers
+_default_cfg       = FORMATS.get(DEFAULT_FORMAT, {})
+MAPPINGS           = _default_cfg.get("mappings", {})
+TEMPLATE_PATH      = _default_cfg.get("template_path")
+SHEET_NAME         = _default_cfg.get("sheet_name")
 HEADERS = list(MAPPINGS.keys())
 
 

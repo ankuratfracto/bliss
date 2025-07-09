@@ -8,7 +8,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from pathlib import Path
 import base64
-from mcc import call_fracto, write_excel_from_ocr, _extract_rows, MAPPINGS, stamp_job_number
+from mcc import call_fracto, write_excel_from_ocr, FORMATS, stamp_job_number
 from PyPDF2 import PdfReader
 
 # ── Page config (must be first Streamlit command) ─────────────
@@ -310,25 +310,9 @@ if pdf_file:
     # Reset file pointer for later reading
     pdf_file.seek(0)
 
-# Manual fields (always visible)
-st.markdown("#### Optional manual fields")
-manual_inputs: dict[str, str] = {}
-job_no: str | None = None
-
-manual_fields = ["Job Number"]
-TOOLTIPS = {
-    "Part No.": "Item part number written to every row.",
-    "Manufacturer Country": "Country of origin (e.g. China, Germany).",
-    "Job Number": "Stamped on PDF header, not in Excel.",
-}
-for col in manual_fields:
-    val = st.text_input(col, key=f"manual_{col}", help=TOOLTIPS.get(col, ""))
-    if not val:
-        continue
-    if col == "Job Number":
-        job_no = val          # only stamp on PDF
-    else:
-        manual_inputs[col] = val  # Excel overrides
+format_names = list(FORMATS.keys())
+selected_format_key = st.selectbox("Select Excel output format", format_names)
+selected_format_cfg = FORMATS[selected_format_key]
 
 # Process button
 run = st.button("⚙️ Process PDF", disabled=pdf_file is None)
