@@ -126,7 +126,7 @@ def stamp_job_number(src_bytes: bytes, job_no: str, margin: int = 20) -> bytes:
 FRACTO_ENDPOINT = "https://prod-ml.fracto.tech//upload-file-smart-ocr"
 API_KEY         = os.getenv("FRACTO_API_KEY")
 PARSER_APP_ID   = "Tua4jrrYqLmCi7jt"
-MODEL_ID        = "v1"
+MODEL_ID        = "tv6"
 EXTRA_ACCURACY  = "true"
 
 # ──────────────────────────────────────────────────────────────────────────
