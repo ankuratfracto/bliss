@@ -1,13 +1,16 @@
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
-CHUNK_SIZE_PAGES = 5
+CHUNK_SIZE_PAGES = 4
 MAX_PARALLEL     = 10
+MIN_TAIL_COMBINE   = 3
 
-
-def _split_pdf_bytes(pdf_bytes: bytes, chunk_size: int = CHUNK_SIZE_PAGES) -> list[bytes]:
+def _split_pdf_bytes(pdf_bytes: bytes,
+                     chunk_size: int = CHUNK_SIZE_PAGES,
+                     min_tail: int = MIN_TAIL_COMBINE) -> list[bytes]:
     """
-    Return a list of PDF byte‑chunks, each containing *chunk_size* pages (except
-    possibly the last chunk). Uses PyPDF2 in‑memory.
+    Return a list of PDF byte-chunks. Keeps 5-page blocks, *except* that a final
+    fragment < min_tail pages is merged into the previous chunk so it retains
+    invoice context (e.g. 26 pages → 5,5,5,5,6 instead of 5,5,5,5,5,1).
     """
     reader = PdfReader(io.BytesIO(pdf_bytes))
     total  = len(reader.pages)
@@ -15,20 +18,40 @@ def _split_pdf_bytes(pdf_bytes: bytes, chunk_size: int = CHUNK_SIZE_PAGES) -> li
         return [pdf_bytes]
 
     chunks: list[bytes] = []
-    for start in range(0, total, chunk_size):
-        writer = PdfWriter()
-        for p in range(start, min(start + chunk_size, total)):
-            writer.add_page(reader.pages[p])
-        buf = io.BytesIO()
-        writer.write(buf)
-        chunks.append(buf.getvalue())
-    return chunks
+    start = 0
+    while start < total:
+        end = min(start + chunk_size, total)
+        # If this is the *last* chunk and it is tiny → back-merge with previous.
+        if total - start < min_tail and chunks:
+            # Append the remaining pages to the previous writer
+            prev_buf = io.BytesIO(chunks.pop())          # last chunk bytes
+            prev_reader = PdfReader(prev_buf)
+            writer = PdfWriter()
+            # re-copy pages of previous chunk
+            for p in prev_reader.pages:
+                writer.add_page(p)
+            # add the tail pages
+            for p in range(start, total):
+                writer.add_page(reader.pages[p])
+            buf = io.BytesIO()
+            writer.write(buf)
+            chunks.append(buf.getvalue())
+            break   # finished
+        else:
+            writer = PdfWriter()
+            for p in range(start, end):
+                writer.add_page(reader.pages[p])
+            buf = io.BytesIO()
+            writer.write(buf)
+            chunks.append(buf.getvalue())
+            start = end
 
+    return chunks
 
 def call_fracto_parallel(pdf_bytes: bytes, file_name: str) -> list[dict]:
     """
-    If the PDF is ≤5 pages, behaves like `call_fracto` (returns [single‑result]).
-    If more, splits into 5‑page chunks and hits the Fracto API concurrently with
+    If the PDF is ≤ chunk_size_pages, behaves like `call_fracto` (returns [single‑result]).
+    If more, splits into chunk_size_pages page chunks and hits the Fracto API concurrently with
     up to `MAX_PARALLEL` workers. Results are returned in order of the chunks.
     """
     chunks = _split_pdf_bytes(pdf_bytes, CHUNK_SIZE_PAGES)
