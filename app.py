@@ -310,6 +310,24 @@ if pdf_file:
     # Reset file pointer for later reading
     pdf_file.seek(0)
 
+# ── Manual overrides ─────────────────────────────────────────────
+st.markdown("#### Optional manual fields")
+manual_inputs: dict[str, str] = {}
+job_no: str | None = None
+
+manual_fields = ["Job Number"]    # add more keys here if needed
+TOOLTIPS = {
+    "Job Number": "Stamped at the top of every page in the PDF.",
+}
+for col in manual_fields:
+    val = st.text_input(col, key=f"manual_{col}", help=TOOLTIPS.get(col, ""))
+    if not val:
+        continue
+    if col == "Job Number":
+        job_no = val          # used only for PDF stamping
+    else:
+        manual_inputs[col] = val  # Excel overrides
+
 format_names = list(FORMATS.keys())
 selected_format_key = st.selectbox("Select Excel output format", format_names)
 selected_format_cfg = FORMATS[selected_format_key]
@@ -334,7 +352,14 @@ if run:
         progress.progress(0.8)
 
         buffer = io.BytesIO()
-        write_excel_from_ocr([result], buffer, overrides=manual_inputs)
+        write_excel_from_ocr(
+            [result],
+            buffer,
+            overrides=manual_inputs,
+            mappings=selected_format_cfg["mappings"],
+            template_path=selected_format_cfg.get("template_path"),
+            sheet_name=selected_format_cfg.get("sheet_name"),
+        )
         progress.progress(1.0, text="Done!")
         st.session_state["excel_bytes"]   = buffer.getvalue()
         st.session_state["excel_filename"] = pdf_file.name.replace(".pdf", "_ocr.xlsx")
