@@ -296,107 +296,122 @@ def _extract_rows(payload: Any) -> List[Dict[str, Any]]:
 
 def write_excel_from_ocr(
     results: List[Dict[str, Any]],
-    output_path: str,
+    output_path: str | io.BytesIO,
     overrides: dict[str, str] | None = None,
+    *,
+    mappings: dict[str, str] | None = None,
+    template_path: str | None = None,
+    sheet_name: str | None = None,
 ):
     """
     Write OCR rows to *output_path*.
 
-    *overrides* – optional `{column_name: value}` pairs that will be:
-      • Added to the header row if the column doesn't exist yet.
-      • Written (or overwritten) with the given value in **every** row.
+    Parameters
+    ----------
+    results : list[dict]
+        Fracto API responses (or pre‑loaded JSON) – list of results.
+    output_path : str | io.BytesIO
+        Where to write the Excel workbook.
+    overrides : dict[str, str], optional
+        {column_name: value} pairs forced into every row (e.g. constant HS‑Code).
+    mappings : dict[str, str], optional
+        Column → source‑field mapping. Defaults to the global MAPPINGS.
+    template_path : str | Path, optional
+        Path to an .xlsx template to use as a base (preserves styles).
+    sheet_name : str, optional
+        Which sheet inside the template/workbook to write into. Defaults to the
+        first/active sheet.
     """
+    mappings = mappings or MAPPINGS
+    template_path = template_path or TEMPLATE_PATH
+    sheet_name = sheet_name or SHEET_NAME
     overrides = overrides or {}
 
-    # Keep only overrides whose column exists in the YAML header list
-    overrides = {k: v for k, v in overrides.items() if k in HEADERS}
+    headers = list(mappings.keys())
 
-    if TEMPLATE_PATH and TEMPLATE_PATH.exists():
-        wb = load_workbook(TEMPLATE_PATH)
+    # Keep only overrides whose column exists in the header list
+    overrides = {k: v for k, v in overrides.items() if k in headers}
+
+    # Load or create workbook
+    if template_path and Path(template_path).expanduser().exists():
+        wb = load_workbook(Path(template_path).expanduser())
     else:
         wb = Workbook()
-    if SHEET_NAME and SHEET_NAME in wb.sheetnames:
-        ws = wb[SHEET_NAME]
+
+    # Select or create target sheet
+    if sheet_name and sheet_name in wb.sheetnames:
+        ws = wb[sheet_name]
     else:
         ws = wb.active
 
-    # Clear existing data in the sheet
+    # Clear existing data
     ws.delete_rows(1, ws.max_row)
 
-    # ── Gather all rows ──
+    # ── Gather rows from results ──
     all_rows: list[dict] = []
     for result in results:
         payload = result.get("data", [])
         rows = _extract_rows(payload)
         all_rows.extend(rows)
 
-    # Compose final header row (strictly from YAML)
-    dynamic_headers = HEADERS  # no extras
-    ws.append(dynamic_headers)
+    # Header row
+    ws.append(headers)
 
-    # Write data
+    # Write data rows
     written = 0
     for row in all_rows:
-        values = []
-        for col in dynamic_headers:
-            field = MAPPINGS.get(col, col)  # default to same name if not mapped
-            value = overrides.get(col, row.get(field, ""))
-            values.append(value)
-        ws.append(values)
+        excel_row = []
+        for col in headers:
+            src_field = mappings.get(col, col)
+            value = overrides.get(col, row.get(src_field, ""))
+            excel_row.append(value)
+        ws.append(excel_row)
         written += 1
 
-    # ── Beautify ─────────────────────────────────────────────────────────
-    # Header style: bold white text on dark blue
+    # ── Styling (same as before) ──
     header_font  = Font(bold=True, color="FFFFFF")
-    header_fill  = PatternFill("solid", fgColor="305496")  # MS Office blue
+    header_fill  = PatternFill("solid", fgColor="305496")
     header_align = Alignment(vertical="center", horizontal="center", wrap_text=True)
+    thin_border  = Side(border_style="thin", color="999999")
+    border       = Border(left=thin_border, right=thin_border, top=thin_border, bottom=thin_border)
 
-    # Thin border for all cells
-    thin = Side(border_style="thin", color="999999")
-    border = Border(left=thin, right=thin, top=thin, bottom=thin)
-
-    # Apply header style
     for cell in ws[1]:
         cell.font = header_font
         cell.fill = header_fill
         cell.alignment = header_align
         cell.border = border
 
-    # Auto‑size columns based on max content length (capped)
-    max_width = 60  # chars
-    for col_idx, column in enumerate(ws.iter_cols(min_row=1, max_row=ws.max_row), start=1):
-        longest = max((len(str(cell.value)) if cell.value is not None else 0) for cell in column)
-        width = min(max(longest + 2, 10), max_width)  # padding, min 10
+    max_width = 60
+    for column in ws.iter_cols(min_row=1, max_row=ws.max_row):
+        longest = max(len(str(c.value)) if c.value is not None else 0 for c in column)
+        width = min(max(longest + 2, 10), max_width)
         ws.column_dimensions[column[0].column_letter].width = width
-        for cell in column[1:]:  # skip header, already styled
-            cell.border = border
-            cell.alignment = Alignment(vertical="top", wrap_text=True)
+        for c in column[1:]:
+            c.border = border
+            c.alignment = Alignment(vertical="top", wrap_text=True)
 
-    # Freeze header row
     ws.freeze_panes = "A2"
-
-    # Ensure gridlines visible (safe for ERP)
     ws.sheet_view.showGridLines = True
 
-    # ── Beautify: borders, alignment, zebra striping ──
-    thin = Side(border_style="thin", color="DDDDDD")
-    border = Border(left=thin, right=thin, top=thin, bottom=thin)
-    center = Alignment(horizontal="center", vertical="center", wrap_text=True)
-    # Borders & alignment for all data cells (header + rows)
-    for row in ws.iter_rows(min_row=1, max_row=ws.max_row, min_col=1, max_col=ws.max_column):
-        for cell in row:
-            cell.border = border
-            cell.alignment = center
-    # Zebra striping: light grey fill on even data rows for readability
-    stripe_fill = PatternFill("solid", fgColor="F2F2F2")  # very light grey
-    for row_idx in range(2, ws.max_row + 1):  # data starts on row 2
-        if row_idx % 2 == 0:
-            for cell in ws[row_idx]:
-                cell.fill = stripe_fill
-    # Freeze header row
-    ws.freeze_panes = ws["A2"]
-    wb.save(output_path)
-    logger.info("Excel written to %s (%d rows, %d columns)", output_path, written, len(dynamic_headers))
+    # Zebra striping for readability
+    stripe_fill = PatternFill("solid", fgColor="F2F2F2")
+    for r in range(2, ws.max_row + 1):
+        if r % 2 == 0:
+            for c in ws[r]:
+                c.fill = stripe_fill
+
+    # Save
+    if isinstance(output_path, io.BytesIO):
+        wb.save(output_path)
+    else:
+        wb.save(str(output_path))
+
+    logger.info(
+        "Excel written to %s (%d rows, %d columns)",
+        output_path if isinstance(output_path, str) else "<buffer>",
+        written,
+        len(headers),
+    )
 
 
 # ─── Main Entry Point ────────────────────────────────────────────────────
