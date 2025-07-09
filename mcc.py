@@ -1,3 +1,58 @@
+from concurrent.futures import ThreadPoolExecutor, as_completed
+
+CHUNK_SIZE_PAGES = 5
+MAX_PARALLEL     = 10
+
+
+def _split_pdf_bytes(pdf_bytes: bytes, chunk_size: int = CHUNK_SIZE_PAGES) -> list[bytes]:
+    """
+    Return a list of PDF byte‑chunks, each containing *chunk_size* pages (except
+    possibly the last chunk). Uses PyPDF2 in‑memory.
+    """
+    reader = PdfReader(io.BytesIO(pdf_bytes))
+    total  = len(reader.pages)
+    if total <= chunk_size:
+        return [pdf_bytes]
+
+    chunks: list[bytes] = []
+    for start in range(0, total, chunk_size):
+        writer = PdfWriter()
+        for p in range(start, min(start + chunk_size, total)):
+            writer.add_page(reader.pages[p])
+        buf = io.BytesIO()
+        writer.write(buf)
+        chunks.append(buf.getvalue())
+    return chunks
+
+
+def call_fracto_parallel(pdf_bytes: bytes, file_name: str) -> list[dict]:
+    """
+    If the PDF is ≤5 pages, behaves like `call_fracto` (returns [single‑result]).
+    If more, splits into 5‑page chunks and hits the Fracto API concurrently with
+    up to `MAX_PARALLEL` workers. Results are returned in order of the chunks.
+    """
+    chunks = _split_pdf_bytes(pdf_bytes, CHUNK_SIZE_PAGES)
+    if len(chunks) == 1:
+        return [call_fracto(pdf_bytes, file_name)]
+
+    logger.info("Splitting %s into %d chunks of %d pages each", file_name, len(chunks), CHUNK_SIZE_PAGES)
+
+    results: list[dict] = [None] * len(chunks)
+
+    with ThreadPoolExecutor(max_workers=MAX_PARALLEL) as pool:
+        futures = {
+            pool.submit(call_fracto, chunk, f"{file_name} (part {i+1})"): i
+            for i, chunk in enumerate(chunks)
+        }
+        for fut in as_completed(futures):
+            idx = futures[fut]
+            try:
+                results[idx] = fut.result()
+            except Exception as exc:
+                logger.error("Chunk %d failed: %s", idx + 1, exc)
+                results[idx] = {"file": file_name, "status": "error", "error": str(exc)}
+
+    return results
 #!/usr/bin/env python
 """
 fracto_page_ocr.py
@@ -175,14 +230,6 @@ def call_fracto(file_bytes: bytes, file_name: str) -> Dict[str, Any]:
         return {"file": file_name, "status": "error", "error": str(exc)}
 
 
-def process_pdf(pdf_path: str) -> List[Dict[str, Any]]:
-    """
-    Send the complete PDF to Fracto and return a one‑element list with the API response.
-    """
-    pdf_path_obj = Path(pdf_path).expanduser().resolve()
-    file_bytes = pdf_path_obj.read_bytes()
-    result = call_fracto(file_bytes, pdf_path_obj.name)
-    return [result]
 
 
 # ─── Helper to persist results ───────────────────────────────────────────

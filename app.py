@@ -13,7 +13,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from pathlib import Path
 import base64
-from mcc import call_fracto, write_excel_from_ocr, stamp_job_number
+from mcc import call_fracto_parallel, write_excel_from_ocr, stamp_job_number
 from PyPDF2 import PdfReader
 
 # ── Page config (must be first Streamlit command) ─────────────
@@ -354,12 +354,12 @@ if run:
             pdf_bytes = stamp_job_number(pdf_bytes, job_no)
         progress.progress(0.4)
 
-        result = call_fracto(pdf_bytes, pdf_file.name)
+        results = call_fracto_parallel(pdf_bytes, pdf_file.name)
         progress.progress(0.8)
 
         buffer = io.BytesIO()
         write_excel_from_ocr(
-            [result],
+            results,
             buffer,
             overrides=manual_inputs,
             mappings=selected_format_cfg["mappings"],
