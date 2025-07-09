@@ -75,6 +75,7 @@ def call_fracto_parallel(pdf_bytes: bytes, file_name: str) -> list[dict]:
                 logger.error("Chunk %d failed: %s", idx + 1, exc)
                 results[idx] = {"file": file_name, "status": "error", "error": str(exc)}
 
+    _renumber_serials(results)
     return results
 #!/usr/bin/env python
 """
@@ -482,6 +483,23 @@ def write_excel_from_ocr(
         written,
         len(headers),
     )
+
+def _renumber_serials(results: list[dict],
+                      json_field: str = "Serial_Number",
+                      excel_header: str = "Item No.") -> None:
+    """
+    Mutates *results* in-place so that every row has a globally increasing
+    serial number (1, 2, 3 …) across all Fracto chunks.
+
+    The column name in the JSON is *json_field*; if it differs between your two
+    formats, you can look it up via mappings in the caller instead.
+    """
+    counter = 1
+    for res in results:
+        rows = _extract_rows(res.get("data", []))
+        for row in rows:
+            row[json_field] = counter
+            counter += 1
 
 
 # ─── Main Entry Point ────────────────────────────────────────────────────
