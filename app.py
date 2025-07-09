@@ -1,6 +1,11 @@
 # app.py
 
 
+# Ensure the latest mapping.yaml changes are picked up
+import importlib, mcc as _mcc_mod
+importlib.reload(_mcc_mod)
+from mcc import FORMATS     # refresh the constant after reload
+
 import io, textwrap
 import streamlit as st
 import os
@@ -8,7 +13,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from pathlib import Path
 import base64
-from mcc import call_fracto, write_excel_from_ocr, FORMATS, stamp_job_number
+from mcc import call_fracto, write_excel_from_ocr, stamp_job_number
 from PyPDF2 import PdfReader
 
 # ── Page config (must be first Streamlit command) ─────────────
