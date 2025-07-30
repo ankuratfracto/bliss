@@ -1,5 +1,5 @@
 formats:
-  Format 1:
+  PRODUCT:
     template_path: "./templates/customs_invoice_template.xlsx"   # optional
     sheet_name: "Sheet1"                                         # optional
     mappings:
@@ -155,7 +155,7 @@ formats:
       "SW-Qty10": sw_qty10
       "SW-QtyUnit10": sw_qtyunit10
 
-  Format 2:
+  INVOICE:
     template_path: ""        # optional – leave blank if you don’t have a pre‑styled workbook
     sheet_name: "Sheet1"  
     mappings:

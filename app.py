@@ -368,7 +368,8 @@ if run:
         )
         progress.progress(1.0, text="Done!")
         st.session_state["excel_bytes"]   = buffer.getvalue()
-        st.session_state["excel_filename"] = pdf_file.name.replace(".pdf", "_ocr.xlsx")
+        base_name = Path(pdf_file.name).stem
+        st.session_state["excel_filename"] = f"{base_name}_ocr.xlsx"
         st.toast("✅ Excel generated!", icon="🎉")
     except Exception as exc:
         st.toast(f"❌ Error: {exc}", icon="⚠️")
@@ -408,8 +409,8 @@ if st.session_state["excel_bytes"]:
         out_buf = io.BytesIO()
         wb_orig.save(out_buf)
         st.session_state["edited_excel_bytes"] = out_buf.getvalue()
-        st.session_state["edited_filename"] = st.session_state["excel_filename"].replace(
-            ".xlsx", "_edited.xlsx"
+        st.session_state["edited_filename"] = (
+            Path(st.session_state["excel_filename"]).with_suffix("").name + "_edited.xlsx"
         )
         st.success("Edits saved — scroll below to download the .xlsx file.")
 
