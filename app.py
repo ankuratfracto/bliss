@@ -435,7 +435,12 @@ if st.session_state["excel_bytes"]:
     if "Qty" in view_df.columns:
         st.metric("Total Qty", f"{view_df['Qty'].sum():,.0f}")
     if "Unit Price" in view_df.columns:
-        st.metric("Sum Unit Price", f"{view_df['Unit Price'].sum():,.0f}")
+        total_unit_price = (
+            pd.to_numeric(view_df["Unit Price"], errors="coerce")  # convert non‑numbers → NaN
+              .fillna(0)                                           # treat NaNs as 0
+              .sum()
+        )
+        st.metric("Sum Unit Price", f"{total_unit_price:,.0f}")
 
     # ── Top Part Numbers by Qty chart ─────────────────────────
     if {"Part No.", "Qty"}.issubset(view_df.columns):
