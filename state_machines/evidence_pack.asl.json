@@ -1,0 +1,17 @@
+{
+  "Comment": "Monthly Evidence Pack",
+  "StartAt": "CollectFindings",
+  "States": {
+    "CollectFindings": {
+      "Type": "Task",
+      "Resource": "__LAMBDA_ARN__",
+      "ResultPath": "$.collect",
+      "Next": "Notify"
+    },
+    "Notify": {
+      "Type": "Pass",
+      "Comment": "SNS notification wired by Terraform policy; use a separate Lambda if you want a custom email body.",
+      "End": true
+    }
+  }
+}

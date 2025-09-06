@@ -1,0 +1,13 @@
+{
+  "fileLocations": [
+    {
+      "URIs": [
+        "s3://YOUR-EVIDENCE-BUCKET/securityhub/findings/"
+      ]
+    }
+  ],
+  "globalUploadSettings": {
+    "format": "JSON",
+    "containsHeader": "false"
+  }
+}
