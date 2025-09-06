@@ -147,7 +147,12 @@ def stamp_job_number(src_bytes: bytes, job_no: str, margin: int = 20) -> bytes:
     return out_buf.getvalue()
 
 # ─── CONFIG ──────────────────────────────────────────────────────────────
-FRACTO_ENDPOINT = "https://prod-ml.fracto.tech//upload-file-smart-ocr"
+# Allow overriding the endpoint via env var `FRACTO_ENDPOINT`.
+# Default uses the production Smart‑OCR endpoint (single slash path).
+FRACTO_ENDPOINT = os.getenv(
+    "FRACTO_ENDPOINT",
+    "https://prod-ml.fracto.tech/upload-file-smart-ocr",
+)
 API_KEY         = os.getenv("FRACTO_API_KEY")
 PARSER_APP_ID   = "Tua4jrrYqLmCi7jt"
 MODEL_ID        = "tv6"
@@ -234,6 +239,11 @@ def call_fracto(file_bytes: bytes, file_name: str) -> Dict[str, Any]:
         "model": MODEL_ID,
         "extra_accuracy": EXTRA_ACCURACY,
     }
+    # Prepare headers; require API key for production endpoint
+    if not API_KEY:
+        raise RuntimeError(
+            "FRACTO_API_KEY is not set. Add it to your environment or Streamlit secrets."
+        )
     headers = {"x-api-key": API_KEY}
 
     try:

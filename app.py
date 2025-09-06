@@ -391,7 +391,7 @@ if st.session_state["excel_bytes"]:
     edited_df = st.data_editor(
         df,
         num_rows="dynamic",
-        use_container_width=True,
+        width='stretch',
         key="editable_grid",
     )
 
