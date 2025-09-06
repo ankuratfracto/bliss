@@ -445,11 +445,13 @@ if st.session_state["excel_bytes"]:
     # ── Top Part Numbers by Qty chart ─────────────────────────
     if {"Part No.", "Qty"}.issubset(view_df.columns):
         st.markdown("#### Top SKUs by Qty")
+        # Ensure Qty is numeric before grouping; non-numeric becomes NaN
         top_qty = (
-            view_df.groupby("Part No.")["Qty"]
-            .sum(numeric_only=True)
-            .sort_values(ascending=False)
-            .head(10)
+            pd.to_numeric(view_df["Qty"], errors="coerce")
+              .groupby(view_df["Part No."])
+              .sum()
+              .sort_values(ascending=False)
+              .head(10)
         )
 
         if top_qty.empty or top_qty.shape[0] < 1:
